@@ -15,13 +15,20 @@ const {
   checkCypressInstallationSpinner,
   getLatestCypressDetailsSpinner,
   compareVersionsSpinner,
-  installCypressSpinner
+  installCypressSpinner,
+  clearCacheSpinner,
+  readCacheSpinner
 } = require("./util/spinners");
+const { getCachedVersions } = require("./util/fileSystem");
+
+const path = require("path");
 
 const chalk = require("chalk");
 
 const main = async () => {
   try {
+    const isMac = process.platform === "darwin";
+    const isWin = process.platform === "win32";
     // * Title
     await generateTitle("Cypress Tool");
 
@@ -88,26 +95,45 @@ const main = async () => {
         // * Detect if user has a HTTP_PROXY env var set up
         const userNeedsProxy = process.env.HTTP_PROXY;
 
-        // TODO - Check Cache
-        // ? TODO - Clear Cache
-
         if (userNeedsProxy) {
           console.log(
             chalk.red("NEED TO DEVELOP WHAT SHOULD HAPPEN FOR PROXY")
           );
           process.exit();
         } else {
-          const installSpinner = installCypressSpinner(
-            latestCypressDetails.version
+          // * Read Cypress Cache
+          readCacheSpinner.start();
+          const cacheLocation = isMac
+            ? path.join(process.env.HOME, "/Library/Caches/Cypress")
+            : path.join(process.env.TEMP, "../Cypress/Cache");
+          const cachedVersions = await getCachedVersions(cacheLocation).catch(
+            e => {
+              readCacheSpinner.fail();
+              throw new Error(e);
+            }
           );
-          installSpinner.start();
-          await installCypress(latestCypressDetails.version).catch(e => {
-            installSpinner.fail();
-            throw new Error(e);
-          });
-          installSpinner.succeed(
-            `Installed Cypress v${latestCypressDetails.version}`
-          );
+          if (cachedVersions.length > 0) {
+            readCacheSpinner.succeed(
+              `Cypress cache contains ${cachedVersions}`
+            );
+          } else {
+            readCacheSpinner.succeed(`Cypress cache is empty`);
+          }
+
+          // * Clear Cypress Cache
+          // clearCacheSpinner.start()
+
+          // const installSpinner = installCypressSpinner(
+          //   latestCypressDetails.version
+          // );
+          // installSpinner.start();
+          // await installCypress(latestCypressDetails.version).catch(e => {
+          //   installSpinner.fail();
+          //   throw new Error(e);
+          // });
+          // installSpinner.succeed(
+          //   `Installed Cypress v${latestCypressDetails.version}`
+          // );
         }
       }
     }

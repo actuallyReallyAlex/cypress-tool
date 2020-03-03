@@ -1,3 +1,6 @@
+const path = require("path");
+const fs = require("fs");
+
 /**
  * Saves Cypress file.
  * @param {Object} res Response
@@ -15,3 +18,39 @@ const saveFile = (res, bar) =>
       return reject(e);
     }
   });
+
+const checkIfFileExists = path =>
+  new Promise((resolve, reject) => {
+    fs.stat(path, (err, stats) => {
+      if (err) {
+        return resolve(false);
+      }
+      return resolve(stats);
+    });
+  });
+
+const getCachedVersions = cachePath =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const exists = await checkIfFileExists(cachePath);
+
+      if (exists) {
+        fs.readdir(cachePath, (err, files) => {
+          if (err) {
+            return reject(err);
+          }
+
+          return resolve(files);
+        });
+      } else {
+        return resolve([]);
+      }
+    } catch (e) {
+      return reject(e);
+    }
+  });
+
+module.exports = {
+  getCachedVersions,
+  checkIfFileExists
+};
