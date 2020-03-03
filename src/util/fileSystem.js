@@ -95,5 +95,6 @@ module.exports = {
   getCachedVersions,
   checkIfFileExists,
   removeFile,
-  clearCache
+  clearCache,
+  saveFile
 };

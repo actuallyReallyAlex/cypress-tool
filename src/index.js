@@ -1,5 +1,6 @@
 // const { makeRequest } = require("./util/request");
 const { generateTitle } = require("./util/title");
+const { download } = require("./util/request");
 const {
   getCurrentCypressVersion,
   getLatestCypressDetails,
@@ -17,9 +18,14 @@ const {
   compareVersionsSpinner,
   installCypressSpinner,
   clearCacheSpinner,
-  readCacheSpinner
+  readCacheSpinner,
+  downloadSpinner
 } = require("./util/spinners");
-const { getCachedVersions, removeFile, clearCache } = require("./util/fileSystem");
+const {
+  getCachedVersions,
+  removeFile,
+  clearCache
+} = require("./util/fileSystem");
 
 const path = require("path");
 
@@ -116,17 +122,29 @@ const main = async () => {
             readCacheSpinner.succeed(
               `Cypress cache contains ${cachedVersions}`
             );
+
+            // * Clear Cypress Cache
+            clearCacheSpinner.start();
+            await clearCache(cacheLocation, cachedVersions).catch(e => {
+              clearCacheSpinner.fail();
+              throw new Error(e);
+            });
+            clearCacheSpinner.succeed("Cache cleared");
           } else {
             readCacheSpinner.succeed(`Cypress cache is empty`);
           }
 
-          // * Clear Cypress Cache
-          clearCacheSpinner.start();
-          await clearCache(cacheLocation, cachedVersions).catch(e => {
-            clearCacheSpinner.fail()
-            throw new Error(e)
-          })
-          clearCacheSpinner.succeed("Cache cleared")
+          // TODO - Download Cypress for platform
+          // * Download Cypress.zip for platform
+          const downloadUrl =
+            latestCypressDetails.packages[process.platform].url;
+          await download(downloadUrl).catch(e => {
+            dlSpinner.fail();
+            throw new Error(e);
+          });
+          downloadSpinner.succeed(
+            `Downloaded Cypress v${latestCypressDetails.version}`
+          );
 
           // const installSpinner = installCypressSpinner(
           //   latestCypressDetails.version

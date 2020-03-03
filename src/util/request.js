@@ -1,9 +1,10 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const fetch = require("node-fetch");
 const httpsProxyAgent = require("https-proxy-agent");
-// const fs = require("fs");
 
-// const ProgressBar = require("progress");
+const { saveFile } = require("./fileSystem");
+
+const ProgressBar = require("progress");
 
 /**
  * Makes a request to a url.
@@ -35,30 +36,34 @@ const makeRequest = (
     }
   });
 
-// /**
-//  * Downloads and saves a file.
-//  * @param {String} url URL
-//  */
-// const download = url =>
-//   new Promise((resolve, reject) => {
-//     try {
-//       fetch(url, { agent })
-//         .then(async response => {
-//           const contentLength = await response.headers.get("content-length");
-//           const bar = new ProgressBar("Downloading [:bar] :percent :etas", {
-//             complete: "=",
-//             incomplete: " ",
-//             width: 50,
-//             total: Number(contentLength)
-//           });
+/**
+ * Downloads and saves a file.
+ * @param {String} url URL
+ */
+const download = url =>
+  new Promise((resolve, reject) => {
+    try {
+      fetch(url, {
+        agent: process.env.HTTP_PROXY
+          ? new httpsProxyAgent(process.env.HTTP_PROXY)
+          : undefined
+      })
+        .then(async response => {
+          const contentLength = await response.headers.get("content-length");
+          const bar = new ProgressBar("Downloading [:bar] :percent :etas", {
+            complete: "=",
+            incomplete: " ",
+            width: 50,
+            total: Number(contentLength)
+          });
 
-//           await saveFile(response, bar);
-//           resolve();
-//         })
-//         .catch(e => reject(e));
-//     } catch (e) {
-//       return reject(e);
-//     }
-//   });
+          await saveFile(response, bar);
+          resolve();
+        })
+        .catch(e => reject(e));
+    } catch (e) {
+      return reject(e);
+    }
+  });
 
-module.exports = { makeRequest };
+module.exports = { download, makeRequest };

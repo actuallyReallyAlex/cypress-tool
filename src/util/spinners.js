@@ -5,10 +5,10 @@ const checkCypressInstallationSpinner = ora(
   "Checking for Cypress installation"
 );
 const compareVersionsSpinner = ora("Comparing Cypress versions");
-const installCypressSpinner = latestVersion =>
-  ora(`Installing Cypress v${latestVersion}`);
+const installCypressSpinner = version => ora(`Installing Cypress v${version}`);
 const readCacheSpinner = ora("Reading Cypress cache");
 const clearCacheSpinner = ora("Clearing Cypress cache");
+const downloadSpinner = ora();
 
 module.exports = {
   getLatestCypressDetailsSpinner,
@@ -16,5 +16,6 @@ module.exports = {
   compareVersionsSpinner,
   installCypressSpinner,
   readCacheSpinner,
-  clearCacheSpinner
+  clearCacheSpinner,
+  downloadSpinner
 };
