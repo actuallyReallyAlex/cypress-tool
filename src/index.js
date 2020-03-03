@@ -1,3 +1,6 @@
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+
 // const { makeRequest } = require("./util/request");
 const { generateTitle } = require("./util/title");
 const { download } = require("./util/request");
