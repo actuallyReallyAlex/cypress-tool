@@ -1,4 +1,4 @@
-const { exec, spawn } = require("child_process");
+import { exec, spawn } from "child_process";
 
 /**
  * Executes a command in a side process.

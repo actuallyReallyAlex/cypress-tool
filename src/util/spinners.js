@@ -1,21 +1,21 @@
-const ora = require("ora");
+import ora from "ora";
 
-const getLatestCypressDetailsSpinner = ora("Getting latest Cypress details");
 const checkCypressInstallationSpinner = ora(
   "Checking for Cypress installation"
 );
+const clearCacheSpinner = ora("Clearing Cypress cache");
 const compareVersionsSpinner = ora("Comparing Cypress versions");
+const downloadSpinner = ora();
+const getLatestCypressDetailsSpinner = ora("Getting latest Cypress details");
 const installCypressSpinner = version => ora(`Installing Cypress v${version}`);
 const readCacheSpinner = ora("Reading Cypress cache");
-const clearCacheSpinner = ora("Clearing Cypress cache");
-const downloadSpinner = ora();
 
 module.exports = {
-  getLatestCypressDetailsSpinner,
   checkCypressInstallationSpinner,
-  compareVersionsSpinner,
-  installCypressSpinner,
-  readCacheSpinner,
   clearCacheSpinner,
-  downloadSpinner
+  compareVersionsSpinner,
+  downloadSpinner,
+  getLatestCypressDetailsSpinner,
+  installCypressSpinner,
+  readCacheSpinner
 };

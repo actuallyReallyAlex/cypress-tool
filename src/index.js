@@ -1,43 +1,31 @@
 import "core-js/stable";
 import "regenerator-runtime/runtime";
+import chalk from "chalk";
+import path from "path";
 
-// const { makeRequest } = require("./util/request");
-const { generateTitle } = require("./util/title");
-const { download } = require("./util/request");
-const {
-  getCurrentCypressVersion,
-  getLatestCypressDetails,
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
+import { isMac } from "./constants";
+import {
   checkIfUpToDate,
-  installCypress
-} = require("./util/cypress");
-// const { getCachedVersions } = require("./util/getCachedVersions");
-// const { isUpToDate } = require("./util/isUpToDate");
-// const { promptUpdateCypress } = require("./util/cypress");
-// const ora = require("ora");
-const { promptToInstallCypress } = require("./util/prompts");
-const {
+  getCurrentCypressVersion,
+  getLatestCypressDetails
+} from "./util/cypress";
+import { clearCache, getCachedVersions } from "./util/fileSystem";
+import { promptToInstallCypress } from "./util/prompts";
+import { download } from "./util/request";
+import {
   checkCypressInstallationSpinner,
-  getLatestCypressDetailsSpinner,
-  compareVersionsSpinner,
-  installCypressSpinner,
   clearCacheSpinner,
-  readCacheSpinner,
-  downloadSpinner
-} = require("./util/spinners");
-const {
-  getCachedVersions,
-  removeFile,
-  clearCache
-} = require("./util/fileSystem");
-
-const path = require("path");
-
-const chalk = require("chalk");
+  compareVersionsSpinner,
+  downloadSpinner,
+  getLatestCypressDetailsSpinner,
+  readCacheSpinner
+} from "./util/spinners";
+import { generateTitle } from "./util/title";
 
 const main = async () => {
   try {
-    const isMac = process.platform === "darwin";
-    const isWin = process.platform === "win32";
     // * Title
     await generateTitle("Cypress Tool");
 

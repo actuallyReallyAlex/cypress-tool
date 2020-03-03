@@ -1,10 +1,11 @@
-const figlet = require("figlet");
-const chalk = require("chalk");
-const boxen = require("boxen");
+import boxen from "boxen";
+import chalk from "chalk";
+import figlet from "figlet";
 
 /**
  * Generates a pretty title in the terminal.
  * @param {String} title Title
+ * @returns {Promise} Resolves after logging to the console.
  */
 const generateTitle = title =>
   new Promise((resolve, reject) => {
