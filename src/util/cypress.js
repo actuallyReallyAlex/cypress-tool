@@ -6,7 +6,7 @@
 // const rimraf = require("rimraf");
 const { cypressUrl } = require("../constants");
 const { makeRequest } = require("./request");
-const { execute } = require("./process");
+const { execute, spawnProcess } = require("./process");
 
 const semver = require("semver");
 
@@ -18,8 +18,8 @@ const semver = require("semver");
 const installCypress = version =>
   new Promise(async (resolve, reject) => {
     try {
-      const stdout = await execute(`npm i -g cypress@${version}`);
-      console.log({ stdout });
+      await spawnProcess("npm install", ["-g", `cypress@${version}`], false);
+
       return resolve();
     } catch (e) {
       return reject(e);
