@@ -3,7 +3,8 @@ const { generateTitle } = require("./util/title");
 const {
   getCurrentCypressVersion,
   getLatestCypressDetails,
-  checkIfUpToDate
+  checkIfUpToDate,
+  installCypress
 } = require("./util/cypress");
 // const { getCachedVersions } = require("./util/getCachedVersions");
 // const { isUpToDate } = require("./util/isUpToDate");
@@ -13,11 +14,21 @@ const { promptToInstallCypress } = require("./util/prompts");
 const {
   checkCypressInstallationSpinner,
   getLatestCypressDetailsSpinner,
-  compareVersionsSpinner
+  compareVersionsSpinner,
+  installCypressSpinner,
+  clearCacheSpinner,
+  readCacheSpinner
 } = require("./util/spinners");
+const { getCachedVersions, removeFile, clearCache } = require("./util/fileSystem");
+
+const path = require("path");
+
+const chalk = require("chalk");
 
 const main = async () => {
   try {
+    const isMac = process.platform === "darwin";
+    const isWin = process.platform === "win32";
     // * Title
     await generateTitle("Cypress Tool");
 
@@ -78,7 +89,58 @@ const main = async () => {
       ).catch(e => {
         throw new Error(e);
       });
-      console.log({ shouldInstall });
+
+      // * User selected to install latest version of Cypress
+      if (shouldInstall) {
+        // * Detect if user has a HTTP_PROXY env var set up
+        const userNeedsProxy = process.env.HTTP_PROXY;
+
+        if (userNeedsProxy) {
+          console.log(
+            chalk.red("NEED TO DEVELOP WHAT SHOULD HAPPEN FOR PROXY")
+          );
+          process.exit();
+        } else {
+          // * Read Cypress Cache
+          readCacheSpinner.start();
+          const cacheLocation = isMac
+            ? path.join(process.env.HOME, "/Library/Caches/Cypress")
+            : path.join(process.env.TEMP, "../Cypress/Cache");
+          const cachedVersions = await getCachedVersions(cacheLocation).catch(
+            e => {
+              readCacheSpinner.fail();
+              throw new Error(e);
+            }
+          );
+          if (cachedVersions.length > 0) {
+            readCacheSpinner.succeed(
+              `Cypress cache contains ${cachedVersions}`
+            );
+          } else {
+            readCacheSpinner.succeed(`Cypress cache is empty`);
+          }
+
+          // * Clear Cypress Cache
+          clearCacheSpinner.start();
+          await clearCache(cacheLocation, cachedVersions).catch(e => {
+            clearCacheSpinner.fail()
+            throw new Error(e)
+          })
+          clearCacheSpinner.succeed("Cache cleared")
+
+          // const installSpinner = installCypressSpinner(
+          //   latestCypressDetails.version
+          // );
+          // installSpinner.start();
+          // await installCypress(latestCypressDetails.version).catch(e => {
+          //   installSpinner.fail();
+          //   throw new Error(e);
+          // });
+          // installSpinner.succeed(
+          //   `Installed Cypress v${latestCypressDetails.version}`
+          // );
+        }
+      }
     }
 
     // * Prompt to update (only if installed and out of date)

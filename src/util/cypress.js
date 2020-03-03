@@ -6,9 +6,25 @@
 // const rimraf = require("rimraf");
 const { cypressUrl } = require("../constants");
 const { makeRequest } = require("./request");
-const { execute } = require("./process");
+const { execute, spawnProcess } = require("./process");
 
 const semver = require("semver");
+
+/**
+ * Installs Cypress.
+ * @param {String} latestVersion Version of Cypress to install
+ * @returns {Promise}
+ */
+const installCypress = version =>
+  new Promise(async (resolve, reject) => {
+    try {
+      await spawnProcess("npm install", ["-g", `cypress@${version}`], false);
+
+      return resolve();
+    } catch (e) {
+      return reject(e);
+    }
+  });
 
 /**
  * Get's latest Cypress details from download url.
@@ -64,20 +80,6 @@ const checkIfUpToDate = (latestVersion, installedVersion) =>
 //       const stdout = await execute(`npm i -g cypress@${latestVersion}`);
 //       process.stdout.write(stdout);
 //       resolve();
-//     } catch (e) {
-//       return reject(e);
-//     }
-//   });
-
-// const removeFile = file =>
-//   new Promise((resolve, reject) => {
-//     try {
-//       rimraf(file, error => {
-//         if (error) {
-//           return reject(error);
-//         }
-//         resolve();
-//       });
 //     } catch (e) {
 //       return reject(e);
 //     }
@@ -204,5 +206,6 @@ const checkIfUpToDate = (latestVersion, installedVersion) =>
 module.exports = {
   getCurrentCypressVersion,
   getLatestCypressDetails,
-  checkIfUpToDate
+  checkIfUpToDate,
+  installCypress
 };
