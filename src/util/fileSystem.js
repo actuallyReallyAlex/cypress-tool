@@ -1,5 +1,6 @@
-const path = require("path");
 const fs = require("fs");
+const rimraf = require("rimraf");
+const path = require("path");
 
 /**
  * Saves Cypress file.
@@ -14,6 +15,46 @@ const saveFile = (res, bar) =>
       res.body.on("error", err => reject(err));
       res.body.on("data", chunk => bar.tick(chunk.length));
       fileStream.on("finish", () => resolve());
+    } catch (e) {
+      return reject(e);
+    }
+  });
+
+const asyncForEach = (array, callback) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      for (let index = 0; index < array.length; index++) {
+        await callback(array[index], index, array);
+      }
+      return resolve();
+    } catch (e) {
+      return reject(e);
+    }
+  });
+
+const removeFile = file =>
+  new Promise((resolve, reject) => {
+    try {
+      rimraf(file, error => {
+        if (error) {
+          return reject(error);
+        }
+        resolve();
+      });
+    } catch (e) {
+      return reject(e);
+    }
+  });
+
+const clearCache = (cache, cachedVersions) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      await asyncForEach(
+        cachedVersions,
+        async version => await removeFile(path.join(cache, `/${version}`))
+      );
+
+      resolve();
     } catch (e) {
       return reject(e);
     }
@@ -52,5 +93,7 @@ const getCachedVersions = cachePath =>
 
 module.exports = {
   getCachedVersions,
-  checkIfFileExists
+  checkIfFileExists,
+  removeFile,
+  clearCache
 };

@@ -19,7 +19,7 @@ const {
   clearCacheSpinner,
   readCacheSpinner
 } = require("./util/spinners");
-const { getCachedVersions } = require("./util/fileSystem");
+const { getCachedVersions, removeFile, clearCache } = require("./util/fileSystem");
 
 const path = require("path");
 
@@ -121,7 +121,12 @@ const main = async () => {
           }
 
           // * Clear Cypress Cache
-          // clearCacheSpinner.start()
+          clearCacheSpinner.start();
+          await clearCache(cacheLocation, cachedVersions).catch(e => {
+            clearCacheSpinner.fail()
+            throw new Error(e)
+          })
+          clearCacheSpinner.succeed("Cache cleared")
 
           // const installSpinner = installCypressSpinner(
           //   latestCypressDetails.version
