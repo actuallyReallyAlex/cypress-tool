@@ -3,7 +3,8 @@ const { generateTitle } = require("./util/title");
 const {
   getCurrentCypressVersion,
   getLatestCypressDetails,
-  checkIfUpToDate
+  checkIfUpToDate,
+  installCypress
 } = require("./util/cypress");
 // const { getCachedVersions } = require("./util/getCachedVersions");
 // const { isUpToDate } = require("./util/isUpToDate");
@@ -13,8 +14,11 @@ const { promptToInstallCypress } = require("./util/prompts");
 const {
   checkCypressInstallationSpinner,
   getLatestCypressDetailsSpinner,
-  compareVersionsSpinner
+  compareVersionsSpinner,
+  installCypressSpinner
 } = require("./util/spinners");
+
+const chalk = require("chalk");
 
 const main = async () => {
   try {
@@ -78,7 +82,34 @@ const main = async () => {
       ).catch(e => {
         throw new Error(e);
       });
-      console.log({ shouldInstall });
+
+      // * User selected to install latest version of Cypress
+      if (shouldInstall) {
+        // * Detect if user has a HTTP_PROXY env var set up
+        const userNeedsProxy = process.env.HTTP_PROXY;
+
+        // TODO - Check Cache
+        // ? TODO - Clear Cache
+
+        if (userNeedsProxy) {
+          console.log(
+            chalk.red("NEED TO DEVELOP WHAT SHOULD HAPPEN FOR PROXY")
+          );
+          process.exit();
+        } else {
+          const installSpinner = installCypressSpinner(
+            latestCypressDetails.version
+          );
+          installSpinner.start();
+          await installCypress(latestCypressDetails.version).catch(e => {
+            installSpinner.fail();
+            throw new Error(e);
+          });
+          installSpinner.succeed(
+            `Installed Cypress v${latestCypressDetails.version}`
+          );
+        }
+      }
     }
 
     // * Prompt to update (only if installed and out of date)

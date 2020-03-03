@@ -1,4 +1,4 @@
-const { exec } = require("child_process");
+const { exec, spawn } = require("child_process");
 
 /**
  * Executes a command in a side process.
@@ -19,4 +19,28 @@ const execute = command =>
     }
   });
 
-module.exports = { execute };
+/**
+ * Spawns a new process and writes output
+ * @param {String} command Command to execute
+ * @param {Array} arg Array of arguments (String) to add to command
+ * @param {Boolean} writeOutput Optiona. Default = true. If true, write output to the console.
+ * @returns {Promise}
+ */
+const spawnProcess = (command, arg, writeOutput = true) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const proc = spawn(command, arg, { shell: true });
+
+      if (writeOutput) {
+        proc.stdout.on("data", data => process.stdout.write(data));
+        proc.stderr.on("data", data => process.stderr.write(data));
+      }
+
+      proc.on("close", code => resolve());
+      proc.on("error", error => reject(error));
+    } catch (e) {
+      return reject(e);
+    }
+  });
+
+module.exports = { execute, spawnProcess };
