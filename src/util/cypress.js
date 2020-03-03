@@ -1,8 +1,35 @@
+import path from "path";
 import semver from "semver";
 
 import { cypressUrl } from "../constants";
+import { checkIfFileExists } from "./fileSystem";
 import { execute, spawnProcess } from "./process";
 import { makeRequest } from "./request";
+
+/**
+ * Installs Cypress.
+ * @param {String} latestVersion Version of Cypress to install
+ * @returns {Promise}
+ */
+const addCypress = version =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const zipPath = path.join(__dirname, "../../Cypress.zip");
+      const fileExists = await checkIfFileExists(zipPath);
+
+      if (!fileExists) {
+        throw new Error(`${zipPath} does not exist!`);
+      }
+
+      await spawnProcess("npm install", ["-g", `cypress@${version}`], false, {
+        CYPRESS_INSTALL_BINARY: zipPath
+      });
+
+      return resolve();
+    } catch (e) {
+      return reject(e);
+    }
+  });
 
 /**
  * Checks if the installed version matches the latest version.
@@ -14,22 +41,6 @@ const checkIfUpToDate = (latestVersion, installedVersion) =>
   new Promise((resolve, reject) => {
     try {
       return resolve(semver.satisfies(installedVersion, `=${latestVersion}`));
-    } catch (e) {
-      return reject(e);
-    }
-  });
-
-/**
- * Installs Cypress.
- * @param {String} latestVersion Version of Cypress to install
- * @returns {Promise}
- */
-const installCypress = version =>
-  new Promise(async (resolve, reject) => {
-    try {
-      await spawnProcess("npm install", ["-g", `cypress@${version}`], false);
-
-      return resolve();
     } catch (e) {
       return reject(e);
     }
@@ -69,8 +80,8 @@ const getLatestCypressDetails = () =>
   });
 
 module.exports = {
+  addCypress,
   checkIfUpToDate,
-  installCypress,
   getCurrentCypressVersion,
   getLatestCypressDetails
 };

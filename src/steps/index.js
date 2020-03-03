@@ -1,5 +1,6 @@
 import { isMac } from "../constants";
 import {
+  addCypress,
   checkIfUpToDate,
   getCurrentCypressVersion,
   getLatestCypressDetails
@@ -12,6 +13,7 @@ import {
   compareVersionsSpinner,
   downloadSpinner,
   getLatestCypressDetailsSpinner,
+  installCypressSpinner,
   readCacheSpinner
 } from "../util/spinners";
 import { generateTitle } from "../util/title";
@@ -153,6 +155,21 @@ const downloadCypress = async (downloadUrl, version) => {
   downloadSpinner.succeed(`Downloaded Cypress v${version}`);
 };
 
+/**
+ * Installs Cypress from the downloaded Cypress.zip
+ * @param {String} version Version to install. i.e. 4.0.2
+ * @async
+ */
+const installCypress = async version => {
+  const installSpinner = installCypressSpinner(version);
+  installSpinner.start();
+  await addCypress(version).catch(e => {
+    installSpinner.fail();
+    throw new Error(e);
+  });
+  installSpinner.succeed(`Installed Cypress v${version}`);
+};
+
 module.exports = {
   title,
   getLatestDetails,
@@ -160,5 +177,6 @@ module.exports = {
   isUpToDate,
   readCache,
   cleanCache,
-  downloadCypress
+  downloadCypress,
+  installCypress
 };
