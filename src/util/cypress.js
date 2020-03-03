@@ -85,20 +85,6 @@ const checkIfUpToDate = (latestVersion, installedVersion) =>
 //     }
 //   });
 
-// const removeFile = file =>
-//   new Promise((resolve, reject) => {
-//     try {
-//       rimraf(file, error => {
-//         if (error) {
-//           return reject(error);
-//         }
-//         resolve();
-//       });
-//     } catch (e) {
-//       return reject(e);
-//     }
-//   });
-
 // const deleteSrc = () =>
 //   new Promise((resolve, reject) => {
 //     try {
