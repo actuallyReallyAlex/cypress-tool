@@ -5,10 +5,12 @@ import {
   getLatestCypressDetails
 } from "../util/cypress";
 import { clearCache, getCachedVersions } from "../util/fileSystem";
+import { download } from "../util/request";
 import {
   checkCypressInstallationSpinner,
   clearCacheSpinner,
   compareVersionsSpinner,
+  downloadSpinner,
   getLatestCypressDetailsSpinner,
   readCacheSpinner
 } from "../util/spinners";
@@ -137,11 +139,26 @@ const cleanCache = async (cachedVersions, cacheLocation) => {
   clearCacheSpinner.succeed("Cache cleared");
 };
 
+/**
+ * Downloads and saves Cypress.zip
+ * @param {String} downloadUrl Url to download.
+ * @param {String} version Version of Cypress.
+ * @async
+ */
+const downloadCypress = async (downloadUrl, version) => {
+  await download(downloadUrl).catch(e => {
+    downloadSpinner.fail();
+    throw new Error(e);
+  });
+  downloadSpinner.succeed(`Downloaded Cypress v${version}`);
+};
+
 module.exports = {
   title,
   getLatestDetails,
   getCurrentVersion,
   isUpToDate,
   readCache,
-  cleanCache
+  cleanCache,
+  downloadCypress
 };
