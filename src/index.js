@@ -5,15 +5,14 @@ import chalk from "chalk";
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 import { promptToInstallCypress } from "./util/prompts";
-import { download } from "./util/request";
-import { downloadSpinner } from "./util/spinners";
 import {
   title,
   getLatestDetails,
   getCurrentVersion,
   isUpToDate,
   readCache,
-  cleanCache
+  cleanCache,
+  downloadCypress
 } from "./steps";
 
 const main = async () => {
@@ -60,17 +59,13 @@ const main = async () => {
             await cleanCache(cachedVersions, cacheLocation);
           }
 
-          // TODO - Download Cypress for platform
           // * Download Cypress.zip for platform
-          const downloadUrl =
-            latestCypressDetails.packages[process.platform].url;
-          await download(downloadUrl).catch(e => {
-            dlSpinner.fail();
-            throw new Error(e);
-          });
-          downloadSpinner.succeed(
-            `Downloaded Cypress v${latestCypressDetails.version}`
+          await downloadCypress(
+            latestCypressDetails.packages[process.platform].url,
+            latestCypressDetails.version
           );
+
+          // TODO - Install Cypress
 
           // const installSpinner = installCypressSpinner(
           //   latestCypressDetails.version
