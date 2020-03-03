@@ -4,9 +4,9 @@
   "description": "Tool to help update/fix Cypress installs over US Bank Proxy",
   "main": "index.js",
   "scripts": {
-    "dev": "node src/index.js",
     "build": "babel src -d lib",
-    "start": "node lib/index.js"
+    "start": "node lib/index.js",
+    "clean": "rimraf lib && npm install -g cypress && npx cypress cache clear && npm uninstall -g cypress"
   },
   "keywords": [],
   "author": "Alex Lee <alexander.lee2@usbank.com>",

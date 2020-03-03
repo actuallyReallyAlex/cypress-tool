@@ -24,12 +24,16 @@ const execute = command =>
  * @param {String} command Command to execute
  * @param {Array} arg Array of arguments (String) to add to command
  * @param {Boolean} writeOutput Optiona. Default = true. If true, write output to the console.
+ * @param {Object} additionalEnv Additional envrironment variables for spawn process.
  * @returns {Promise}
  */
-const spawnProcess = (command, arg, writeOutput = true) =>
+const spawnProcess = (command, arg, writeOutput = true, additionalEnv = {}) =>
   new Promise(async (resolve, reject) => {
     try {
-      const proc = spawn(command, arg, { shell: true });
+      const proc = spawn(command, arg, {
+        shell: true,
+        env: { ...process.env, ...additionalEnv }
+      });
 
       if (writeOutput) {
         proc.stdout.on("data", data => process.stdout.write(data));

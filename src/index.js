@@ -12,8 +12,11 @@ import {
   isUpToDate,
   readCache,
   cleanCache,
-  downloadCypress
+  downloadCypress,
+  installCypress
 } from "./steps";
+
+// TODO - Allow to download/install older Cypress versions as well
 
 const main = async () => {
   try {
@@ -65,19 +68,8 @@ const main = async () => {
             latestCypressDetails.version
           );
 
-          // TODO - Install Cypress
-
-          // const installSpinner = installCypressSpinner(
-          //   latestCypressDetails.version
-          // );
-          // installSpinner.start();
-          // await installCypress(latestCypressDetails.version).catch(e => {
-          //   installSpinner.fail();
-          //   throw new Error(e);
-          // });
-          // installSpinner.succeed(
-          //   `Installed Cypress v${latestCypressDetails.version}`
-          // );
+          // * Install Cypress from Cypress.zip
+          await installCypress(latestCypressDetails.version);
         }
       }
     }
