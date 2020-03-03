@@ -11,6 +11,22 @@ const { execute } = require("./process");
 const semver = require("semver");
 
 /**
+ * Installs Cypress.
+ * @param {String} latestVersion Version of Cypress to install
+ * @returns {Promise}
+ */
+const installCypress = version =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const stdout = await execute(`npm i -g cypress@${version}`);
+      console.log({ stdout });
+      return resolve();
+    } catch (e) {
+      return reject(e);
+    }
+  });
+
+/**
  * Get's latest Cypress details from download url.
  */
 const getLatestCypressDetails = () =>
@@ -204,5 +220,6 @@ const checkIfUpToDate = (latestVersion, installedVersion) =>
 module.exports = {
   getCurrentCypressVersion,
   getLatestCypressDetails,
-  checkIfUpToDate
+  checkIfUpToDate,
+  installCypress
 };

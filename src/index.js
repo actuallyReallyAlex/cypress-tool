@@ -3,7 +3,8 @@ const { generateTitle } = require("./util/title");
 const {
   getCurrentCypressVersion,
   getLatestCypressDetails,
-  checkIfUpToDate
+  checkIfUpToDate,
+  installCypress
 } = require("./util/cypress");
 // const { getCachedVersions } = require("./util/getCachedVersions");
 // const { isUpToDate } = require("./util/isUpToDate");
@@ -13,7 +14,8 @@ const { promptToInstallCypress } = require("./util/prompts");
 const {
   checkCypressInstallationSpinner,
   getLatestCypressDetailsSpinner,
-  compareVersionsSpinner
+  compareVersionsSpinner,
+  installCypressSpinner
 } = require("./util/spinners");
 
 const main = async () => {
@@ -78,6 +80,20 @@ const main = async () => {
       ).catch(e => {
         throw new Error(e);
       });
+
+      // * User selected to install latest version of Cypress
+      if (shouldInstall) {
+        const installSpinner = installCypressSpinner(
+          latestCypressDetails.version
+        );
+        installSpinner.start();
+        await installCypress(latestCypressDetails.version).catch(e => {
+          installSpinner.fail();
+          throw new Error(e);
+        });
+        installSpinner.succeed();
+      }
+
       console.log({ shouldInstall });
     }
 
