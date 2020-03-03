@@ -1,95 +1,37 @@
 import "core-js/stable";
 import "regenerator-runtime/runtime";
+import chalk from "chalk";
 
-// const { makeRequest } = require("./util/request");
-const { generateTitle } = require("./util/title");
-const { download } = require("./util/request");
-const {
-  getCurrentCypressVersion,
-  getLatestCypressDetails,
-  checkIfUpToDate,
-  installCypress
-} = require("./util/cypress");
-// const { getCachedVersions } = require("./util/getCachedVersions");
-// const { isUpToDate } = require("./util/isUpToDate");
-// const { promptUpdateCypress } = require("./util/cypress");
-// const ora = require("ora");
-const { promptToInstallCypress } = require("./util/prompts");
-const {
-  checkCypressInstallationSpinner,
-  getLatestCypressDetailsSpinner,
-  compareVersionsSpinner,
-  installCypressSpinner,
-  clearCacheSpinner,
-  readCacheSpinner,
-  downloadSpinner
-} = require("./util/spinners");
-const {
-  getCachedVersions,
-  removeFile,
-  clearCache
-} = require("./util/fileSystem");
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-const path = require("path");
-
-const chalk = require("chalk");
+import { promptToInstallCypress } from "./util/prompts";
+import { download } from "./util/request";
+import { downloadSpinner } from "./util/spinners";
+import {
+  title,
+  getLatestDetails,
+  getCurrentVersion,
+  isUpToDate,
+  readCache,
+  cleanCache
+} from "./steps";
 
 const main = async () => {
   try {
-    const isMac = process.platform === "darwin";
-    const isWin = process.platform === "win32";
     // * Title
-    await generateTitle("Cypress Tool");
+    await title();
 
     // * Get Latest Cypress Details
-    getLatestCypressDetailsSpinner.start();
-    const latestCypressDetails = await getLatestCypressDetails().catch(e => {
-      getLatestCypressDetailsSpinner.fail();
-      throw new Error(e);
-    });
-    getLatestCypressDetailsSpinner.succeed(
-      `Latest Cypress release is v${latestCypressDetails.version}`
-    );
+    const latestCypressDetails = await getLatestDetails();
 
     // * Check if Cypress install exists
-    checkCypressInstallationSpinner.start();
-    const currentCypressVersion = await getCurrentCypressVersion().catch(e => {
-      checkCypressInstallationSpinner.fail();
-      throw new Error(e);
-    });
-
-    if (currentCypressVersion) {
-      checkCypressInstallationSpinner.succeed(
-        `Installed version is v${currentCypressVersion}`
-      );
-    } else {
-      checkCypressInstallationSpinner.warn(
-        "No installed Cypress version detected"
-      );
-    }
+    const currentCypressVersion = await getCurrentVersion();
 
     // * Compare versions (only if installed)
-    let upToDate = false;
-    if (currentCypressVersion) {
-      compareVersionsSpinner.start();
-      upToDate = await checkIfUpToDate(
-        latestCypressDetails.version,
-        currentCypressVersion
-      ).catch(e => {
-        compareVersionsSpinner.fail();
-        throw new Error(e);
-      });
-
-      if (upToDate) {
-        compareVersionsSpinner.succeed(
-          `v${currentCypressVersion} = v${latestCypressDetails.version}`
-        );
-      } else {
-        compareVersionsSpinner.warn(
-          `v${currentCypressVersion} < v${latestCypressDetails.version}`
-        );
-      }
-    }
+    const upToDate = await isUpToDate(
+      currentCypressVersion,
+      latestCypressDetails.version
+    );
 
     // * Prompt to install (only if not installed)
     if (!currentCypressVersion) {
@@ -111,30 +53,11 @@ const main = async () => {
           process.exit();
         } else {
           // * Read Cypress Cache
-          readCacheSpinner.start();
-          const cacheLocation = isMac
-            ? path.join(process.env.HOME, "/Library/Caches/Cypress")
-            : path.join(process.env.TEMP, "../Cypress/Cache");
-          const cachedVersions = await getCachedVersions(cacheLocation).catch(
-            e => {
-              readCacheSpinner.fail();
-              throw new Error(e);
-            }
-          );
-          if (cachedVersions.length > 0) {
-            readCacheSpinner.succeed(
-              `Cypress cache contains ${cachedVersions}`
-            );
+          const { cachedVersions, cacheLocation } = await readCache();
 
+          if (cachedVersions.length > 0) {
             // * Clear Cypress Cache
-            clearCacheSpinner.start();
-            await clearCache(cacheLocation, cachedVersions).catch(e => {
-              clearCacheSpinner.fail();
-              throw new Error(e);
-            });
-            clearCacheSpinner.succeed("Cache cleared");
-          } else {
-            readCacheSpinner.succeed(`Cypress cache is empty`);
+            await cleanCache(cachedVersions, cacheLocation);
           }
 
           // TODO - Download Cypress for platform
