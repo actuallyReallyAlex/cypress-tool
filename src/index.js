@@ -20,7 +20,6 @@ import {
 } from './steps'
 
 // * Prioritized TODOs
-// TODO - Need an event emitter to hanlde repeat visits to Main Menu
 // TODO - package version number in title
 // TODO - On Main Menu -> Yellow if InstalledVersion could be updated. Green if isUpToDate
 // TODO - Add Sentry error tracking
