@@ -1,3 +1,5 @@
+const Sentry = require('@sentry/node')
+Sentry.init({ dsn: 'https://166cfccac6334fa29750ddf656c53445@sentry.io/3668079' })
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import chalk from 'chalk'
@@ -20,7 +22,6 @@ import {
 } from './steps'
 
 // * Prioritized TODOs
-// TODO - Add Sentry error tracking
 // TODO - Use pkg to compile into an executable
 // TODO - Allow to download/install older Cypress versions as well
 // TODO - Option to install locally as dev dependency
@@ -111,6 +112,7 @@ const main = async () => {
     interpretMenuAction(state)
   } catch (e) {
     console.log(chalk.red(e))
+    throw new Error(e)
   }
 }
 

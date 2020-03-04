@@ -12,6 +12,7 @@
   "keywords": [],
   "author": "Alex Lee <alexander.lee2@usbank.com>",
   "dependencies": {
+    "@sentry/node": "^5.13.0",
     "boxen": "^4.2.0",
     "chalk": "^3.0.0",
     "clear": "^0.1.0",
