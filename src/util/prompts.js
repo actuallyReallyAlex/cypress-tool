@@ -1,7 +1,23 @@
 import chalk from 'chalk'
 import inquirer from 'inquirer'
 
-import { generateMainMenu } from './title'
+import { generateAboutPage, generateMainMenu } from './title'
+
+/**
+ * Displays About Menu.
+ * @returns {Promise} Resolves after user chooses to exit.
+ */
+const displayAboutMenu = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      await generateAboutPage()
+      console.log('Press any key to return to Main Menu ...')
+      await keypress()
+      resolve()
+    } catch (e) {
+      return reject(e)
+    }
+  })
 
 /**
  * Displays Main Menu based on current app state.
@@ -36,6 +52,7 @@ const displayMainMenu = state =>
       }
 
       choices.push(new inquirer.Separator())
+      choices.push({ name: 'About', value: 'about' })
       choices.push({ name: 'Exit', value: 'exit' })
 
       const { menuAction } = await inquirer.prompt([
@@ -53,6 +70,22 @@ const displayMainMenu = state =>
       return reject(e)
     }
   })
+
+/**
+ * Pauses the process execution and waits for the user to hit a key.
+ * @returns {Promise} Resolves when user has entered a keystroke.
+ * @async
+ */
+const keypress = async () => {
+  process.stdin.setRawMode(true)
+  return new Promise(resolve => {
+    process.stdin.resume()
+    process.stdin.once('data', data => {
+      process.stdin.setRawMode(false)
+      resolve()
+    })
+  })
+}
 
 /**
  * Prompts user to install Cypress.
@@ -105,4 +138,4 @@ const promptToUpdateCypress = state =>
     }
   })
 
-module.exports = { displayMainMenu, promptToInstallCypress, promptToUpdateCypress }
+module.exports = { displayAboutMenu, displayMainMenu, promptToInstallCypress, promptToUpdateCypress }
