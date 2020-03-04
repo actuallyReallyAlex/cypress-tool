@@ -20,7 +20,7 @@ import {
 } from './steps'
 
 // * Prioritized TODOs
-// TODO - package version number in title
+// TODO - About page
 // TODO - On Main Menu -> Yellow if InstalledVersion could be updated. Green if isUpToDate
 // TODO - Add Sentry error tracking
 // TODO - Use pkg to compile into an executable
