@@ -20,16 +20,16 @@ import {
 } from './steps'
 
 // * Prioritized TODOs
+// ! TODO - Fix double bar separator on menu
+// TODO - Clean up title.js (lots of reusable stuff there I think)
 // TODO - Add Sentry error tracking
 // TODO - Use pkg to compile into an executable
 // TODO - Allow to download/install older Cypress versions as well
 // TODO - Option to install locally as dev dependency
 // TODO - Cooler name than 'Cypress Tool'
+// TODO - Persist app state with configstore for a faster app
 
 // * Not Prioritized TODOs
-// TODO - Persist app state with configstore for a faster app
-// ! TODO - Fix double bar separator on menu
-// TODO - Clean up title.js (lots of reusable stuff there I think)
 
 const main = async () => {
   try {
