@@ -2,8 +2,9 @@ import chalk from 'chalk'
 import path from 'path'
 
 import { isMac } from '../constants'
-import { addCypress, checkIfUpToDate, getCurrentCypressVersion, getLatestCypressDetails } from '../util/cypress'
+import { addCypress, checkIfUpToDate, getCurrentCypressVersion, getLatestCypressDetails, removeCypress } from '../util/cypress'
 import { clearCache, getCachedVersions } from '../util/fileSystem'
+import { displayMainMenu } from '../util/prompts'
 import { download } from '../util/request'
 import {
   checkCypressInstallationSpinner,
@@ -13,6 +14,7 @@ import {
   getLatestCypressDetailsSpinner,
   installCypressSpinner,
   readCacheSpinner,
+  uninstallSpinner,
   updateCypressSpinner
 } from '../util/spinners'
 import { generateTitle } from '../util/title'
@@ -99,7 +101,7 @@ const isUpToDate = async state => {
  * @returns {Object} Returns object of `cachedVersions` and `cacheLocation`.
  * @async
  */
-const readCache = async () => {
+const readCache = async state => {
   readCacheSpinner.start()
   const cacheLocation = isMac ? path.join(process.env.HOME, '/Library/Caches/Cypress') : path.join(process.env.TEMP, '../Cypress/Cache')
   const cachedVersions = await getCachedVersions(cacheLocation).catch(e => {
@@ -162,6 +164,7 @@ const installCypress = async state => {
     installSpinner.fail()
     throw new Error(e)
   })
+  state.installedVersion = version
   installSpinner.succeed(`Installed Cypress ${chalk.yellowBright('v' + version)}`)
 }
 
@@ -182,6 +185,49 @@ const updateCypress = async state => {
   updateSpinner.succeed(`Updated Cypress from ${chalk.yellowBright('v' + oldVersion)} to ${chalk.yellowBright('v' + newVersion)}`)
 }
 
+/**
+ * Uninstalls Cypress from system.
+ * @param {Object} state Application state.
+ * @async
+ */
+const uninstallCypress = async state => {
+  uninstallSpinner.start()
+  await removeCypress().catch(e => {
+    uninstallSpinner.fail()
+    throw new Error(e)
+  })
+  state.installedVersion = false
+  uninstallSpinner.succeed(`Uninstalled Cypress`)
+}
+
+/**
+ * Interprets user selected action from main menu.
+ * @param {Object} state Application state.
+ */
+const interpretMenuAction = async state => {
+  const { menuAction } = state
+
+  const actions = {
+    clearCache: () => {
+      console.log(chalk.redBright('TODO - ClearCache Action'))
+    },
+    install: () => {
+      console.log(chalk.redBright('TODO - Install Action'))
+    },
+    uninstall: async () => {
+      await uninstallCypress(state)
+      await displayMainMenu(state)
+      console.log(chalk.redBright('Need to create an event emitter to handle repeat visits to main menu'))
+      // TODO - Need a way to call interpretMenuAction now too...
+    },
+    update: () => {
+      console.log(chalk.redBright('TODO - Update Action'))
+    }
+  }
+
+  await actions[menuAction]()
+}
+
 module.exports = {
   title,
   getLatestDetails,
@@ -191,5 +237,6 @@ module.exports = {
   cleanCache,
   downloadCypress,
   installCypress,
-  updateCypress
+  updateCypress,
+  interpretMenuAction
 }

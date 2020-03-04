@@ -5,13 +5,30 @@ import chalk from 'chalk'
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 import { displayMainMenu, promptToInstallCypress, promptToUpdateCypress } from './util/prompts'
-import { title, getLatestDetails, getCurrentVersion, isUpToDate, readCache, cleanCache, downloadCypress, installCypress, updateCypress } from './steps'
+import {
+  title,
+  getLatestDetails,
+  getCurrentVersion,
+  isUpToDate,
+  readCache,
+  cleanCache,
+  downloadCypress,
+  installCypress,
+  updateCypress,
+  interpretMenuAction
+} from './steps'
 
 // TODO - Allow to download/install older Cypress versions as well
-// TODO - Abiility to uninstall Cypress
 // TODO - Add Sentry error tracking
 // TODO - Option to install locally as dev dependency
 // TODO - package version number in title
+// TODO - ClearCache Action
+// TODO - Install Action
+// TODO - Update Action
+// TODO - On Main Menu -> Yellow if InstalledVersion could be updated. Green if isUpToDate
+// TODO - Exit menu option
+// TODO - Need an event emitter to hanlde repeat visits to Main Menu
+// ! TODO - Cypress Not Installed -> Start -> Install Cypress latest -> tool prompts user to update even though latest version was just installed
 
 const main = async () => {
   try {
@@ -82,7 +99,7 @@ const main = async () => {
 
     await displayMainMenu(state)
 
-    console.log({ menuAction: state.menuAction })
+    interpretMenuAction(state)
   } catch (e) {
     console.log(chalk.red(e))
   }

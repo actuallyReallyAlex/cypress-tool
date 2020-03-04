@@ -48,7 +48,7 @@ const checkIfUpToDate = (latestVersion, installedVersion) =>
 
 /**
  * Gets version number of installed Cypress version, or returns false.
- * @returns {String|Boolean} Returns version number (3.0.0) or `false` if no install exists
+ * @returns {Promise} Resolves with version number (3.0.0) or `false` if no install exists
  */
 const getCurrentCypressVersion = () =>
   new Promise(async (resolve, reject) => {
@@ -68,6 +68,7 @@ const getCurrentCypressVersion = () =>
 
 /**
  * Get's latest Cypress details from download url.
+ * @returns {Promise} Resolves with response from Cypress.
  */
 const getLatestCypressDetails = () =>
   new Promise(async (resolve, reject) => {
@@ -79,9 +80,25 @@ const getLatestCypressDetails = () =>
     }
   })
 
+/**
+ * Removes Cypress from system.
+ * @returns {Promise} Resolves when Cypress is uninstalled.
+ */
+const removeCypress = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      await spawnProcess('npm uninstall', ['-g', `cypress`], false)
+
+      return resolve()
+    } catch (e) {
+      return reject(e)
+    }
+  })
+
 module.exports = {
   addCypress,
   checkIfUpToDate,
   getCurrentCypressVersion,
-  getLatestCypressDetails
+  getLatestCypressDetails,
+  removeCypress
 }
