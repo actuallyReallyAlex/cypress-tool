@@ -24,7 +24,6 @@ import {
 import { initializeDirectory } from './util/fileSystem'
 
 // * Prioritized TODOs
-// TODO - Use pkg to compile into an executable
 // TODO - Allow to download/install older Cypress versions as well
 // TODO - Option to install locally as dev dependency
 // TODO - Cooler name than 'Cypress Tool'
@@ -33,6 +32,7 @@ import { initializeDirectory } from './util/fileSystem'
 // * Not Prioritized TODOs
 // TODO - Put CypressTool directory path into state
 // TODO - Put some constants like isMac into state
+// TODO - Able to exit process fully in executable
 
 const main = async () => {
   try {
