@@ -184,6 +184,8 @@ const updateCypress = async state => {
     updateSpinner.fail()
     throw new Error(e)
   })
+  state.installedVersion = newVersion
+  state.isUpToDate = true
   updateSpinner.succeed(`Updated Cypress from ${chalk.yellowBright('v' + oldVersion)} to ${chalk.yellowBright('v' + newVersion)}`)
 }
 
@@ -227,8 +229,11 @@ const interpretMenuAction = async state => {
       console.log(chalk.redBright('Need to create an event emitter to handle repeat visits to main menu'))
       // TODO - Need a way to call interpretMenuAction now too...
     },
-    update: () => {
-      console.log(chalk.redBright('TODO - Update Action'))
+    update: async () => {
+      await updateCypress(state)
+      await displayMainMenu(state)
+      console.log(chalk.redBright('Need to create an event emitter to handle repeat visits to main menu'))
+      // TODO - Need a way to call interpretMenuAction now too...
     }
   }
 
