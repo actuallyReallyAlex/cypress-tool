@@ -17,18 +17,18 @@ const displayMainMenu = state =>
       const choices = []
 
       if (!installedVersion) {
-        choices.push('Install Cypress')
+        choices.push({ name: 'Install Cypress', value: 'install' })
       }
 
       // TODO - If upToDate, should not have option to UpdateCypress
       // * but can downgrade if want
       if (installedVersion && !isUpToDate) {
-        choices.push('Update Cypress')
+        choices.push({ name: 'Update Cypress', value: 'update' })
       }
 
       choices.push(new inquirer.Separator())
-      choices.push('Uninstall Cypress')
-      choices.push('Clear Cypress Cache')
+      choices.push({ name: 'Uninstall Cypress', value: 'uninstall' })
+      choices.push({ name: 'Clear Cypress Cache', value: 'clearCache' })
 
       const { menuAction } = await inquirer.prompt([
         {

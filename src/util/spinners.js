@@ -8,6 +8,7 @@ const downloadSpinner = ora()
 const getLatestCypressDetailsSpinner = ora('Getting latest Cypress details')
 const installCypressSpinner = version => ora(`Installing Cypress ${chalk.yellowBright('v' + version)}`)
 const readCacheSpinner = ora('Reading Cypress cache')
+const uninstallSpinner = ora('Uninstalling Cypress')
 const updateCypressSpinner = (oldVersion, newVersion) =>
   ora(`Updating Cypress from ${chalk.yellowBright('v' + oldVersion)} to ${chalk.yellowBright('v' + newVersion)}`)
 
@@ -19,5 +20,6 @@ module.exports = {
   getLatestCypressDetailsSpinner,
   installCypressSpinner,
   readCacheSpinner,
+  uninstallSpinner,
   updateCypressSpinner
 }
