@@ -5,15 +5,15 @@ import { generateMainMenu } from './title'
 
 /**
  * Displays Main Menu based on current app state.
- * @param {String|false} installedVersion Currently installed version of Cypress, or false if no version is installed.
- * @param {Boolean} upToDate If the currently installed version of Cypress is up to date.
- * @param {Object} latestCypressDetails Object of data from Cypress on latest release.
+ * @param {Object} state Application State.
  * @returns {Promise} Resolves with choice of user.
  */
-const displayMainMenu = (installedVersion, upToDate, latestCypressDetails) =>
+const displayMainMenu = state =>
   new Promise(async (resolve, reject) => {
     try {
-      await generateMainMenu(installedVersion, latestCypressDetails.version)
+      const { installedVersion, isUpToDate, latestCypressDetails } = state
+      const latestAvailableVersion = latestCypressDetails.version
+      await generateMainMenu(installedVersion, latestAvailableVersion)
       const choices = []
 
       if (!installedVersion) {
@@ -22,7 +22,7 @@ const displayMainMenu = (installedVersion, upToDate, latestCypressDetails) =>
 
       // TODO - If upToDate, should not have option to UpdateCypress
       // * but can downgrade if want
-      if (installedVersion && !upToDate) {
+      if (installedVersion && !isUpToDate) {
         choices.push('Update Cypress')
       }
 
@@ -38,6 +38,8 @@ const displayMainMenu = (installedVersion, upToDate, latestCypressDetails) =>
           choices
         }
       ])
+
+      state.menuAction = menuAction
       return resolve(menuAction)
     } catch (e) {
       return reject(e)
@@ -46,12 +48,13 @@ const displayMainMenu = (installedVersion, upToDate, latestCypressDetails) =>
 
 /**
  * Prompts user to install Cypress.
- * @param {String} latestVersion Latest version of Cypress.
+ * @param {Object} state Application State.
  * @returns {Promise} Resolves with a boolean of the user's choice.
  */
-const promptToInstallCypress = latestVersion =>
+const promptToInstallCypress = state =>
   new Promise(async (resolve, reject) => {
     try {
+      const latestVersion = state.latestCypressDetails.version
       const { shouldInstall } = await inquirer.prompt([
         {
           type: 'confirm',
@@ -60,6 +63,7 @@ const promptToInstallCypress = latestVersion =>
         }
       ])
 
+      state.shouldInstall = shouldInstall
       return resolve(shouldInstall)
     } catch (e) {
       return reject(e)
@@ -68,13 +72,14 @@ const promptToInstallCypress = latestVersion =>
 
 /**
  * Prompts user to update Cypress.
- * @param {String} oldVersion Old version.
- * @param {String} newVersion New version.
+ * @param {Object} state Application State.
  * @returns {Promise} Resolves with a boolean of the user's choice.
  */
-const promptToUpdateCypress = (oldVersion, newVersion) =>
+const promptToUpdateCypress = state =>
   new Promise(async (resolve, reject) => {
     try {
+      const oldVersion = state.installedVersion
+      const newVersion = state.latestCypressDetails.version
       const { shouldUpdate } = await inquirer.prompt([
         {
           type: 'confirm',
@@ -85,6 +90,7 @@ const promptToUpdateCypress = (oldVersion, newVersion) =>
         }
       ])
 
+      state.shouldUpdate = shouldUpdate
       return resolve(shouldUpdate)
     } catch (e) {
       return reject(e)

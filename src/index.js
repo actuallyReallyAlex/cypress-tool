@@ -9,32 +9,43 @@ import { title, getLatestDetails, getCurrentVersion, isUpToDate, readCache, clea
 
 // TODO - Allow to download/install older Cypress versions as well
 // TODO - Abiility to uninstall Cypress
-// TODO - Show Options screen if decide not to install / update
 // TODO - Add Sentry error tracking
 // TODO - Option to install locally as dev dependency
+// TODO - package version number in title
 
 const main = async () => {
   try {
+    const state = {
+      cacheLocation: null,
+      cachedVersions: null,
+      installedVersion: null,
+      isUpToDate: null,
+      latestCypressDetails: null,
+      menuAction: null,
+      shouldInstall: null,
+      shouldUpdate: null
+    }
+
     // * Title
     await title()
 
     // * Get Latest Cypress Details
-    const latestCypressDetails = await getLatestDetails()
+    await getLatestDetails(state)
 
     // * Check if Cypress install exists
-    const currentCypressVersion = await getCurrentVersion()
+    await getCurrentVersion(state)
 
     // * Compare versions (only if installed)
-    const upToDate = await isUpToDate(currentCypressVersion, latestCypressDetails.version)
+    await isUpToDate(state)
 
     // * Prompt to install (only if not installed)
-    if (!currentCypressVersion) {
-      const shouldInstall = await promptToInstallCypress(latestCypressDetails.version).catch(e => {
+    if (!state.installedVersion) {
+      await promptToInstallCypress(state).catch(e => {
         throw new Error(e)
       })
 
       // * User selected to install latest version of Cypress
-      if (shouldInstall) {
+      if (state.shouldInstall) {
         // * Detect if user has a HTTP_PROXY env var set up
         const userNeedsProxy = process.env.HTTP_PROXY
 
@@ -43,35 +54,35 @@ const main = async () => {
           process.exit()
         } else {
           // * Read Cypress Cache
-          const { cachedVersions, cacheLocation } = await readCache()
+          await readCache(state)
 
-          if (cachedVersions.length > 0) {
+          if (state.cachedVersions.length > 0) {
             // * Clear Cypress Cache
-            await cleanCache(cachedVersions, cacheLocation)
+            await cleanCache(state)
           }
 
           // * Download Cypress.zip for platform
-          await downloadCypress(latestCypressDetails.packages[process.platform].url, latestCypressDetails.version)
+          await downloadCypress(state)
 
           // * Install Cypress from Cypress.zip
-          await installCypress(latestCypressDetails.version)
+          await installCypress(state)
         }
       }
     }
 
-    if (currentCypressVersion && !upToDate) {
+    if (state.installedVersion && !state.isUpToDate) {
       // * Prompt to update (only if installed and out of date)
-      const shouldUpdate = await promptToUpdateCypress(currentCypressVersion, latestCypressDetails.version)
+      await promptToUpdateCypress(state)
 
-      if (shouldUpdate) {
+      if (state.shouldUpdate) {
         // * Update Cypress to the latest version available
-        await updateCypress(currentCypressVersion, latestCypressDetails.version)
+        await updateCypress(state)
       }
     }
 
-    const reCheckCypressVersion = await getCurrentVersion()
-    const menuOption = await displayMainMenu(reCheckCypressVersion, upToDate, latestCypressDetails)
-    console.log({ menuOption })
+    await displayMainMenu(state)
+
+    console.log({ menuAction: state.menuAction })
   } catch (e) {
     console.log(chalk.red(e))
   }

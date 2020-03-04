@@ -25,25 +25,28 @@ const title = async () => await generateTitle('Cypress Tool')
 
 /**
  * Gets latest Cypress details.
+ * @param {Object} state Application State.
  * @returns {Object} Object of latest Cypress details.
  * @async
  */
-const getLatestDetails = async () => {
+const getLatestDetails = async state => {
   getLatestCypressDetailsSpinner.start()
   const latestCypressDetails = await getLatestCypressDetails().catch(e => {
     getLatestCypressDetailsSpinner.fail()
     throw new Error(e)
   })
   getLatestCypressDetailsSpinner.succeed(`Latest Cypress release is ${chalk.yellowBright('v' + latestCypressDetails.version)}`)
+  state.latestCypressDetails = latestCypressDetails
   return latestCypressDetails
 }
 
 /**
  * Gets current Cypress version installed on machine.
+ * @param {Object} state Application State.
  * @returns {String|false} Returns the string of the version if installed, or false otherwise.
  * @async
  */
-const getCurrentVersion = async () => {
+const getCurrentVersion = async state => {
   checkCypressInstallationSpinner.start()
   const currentCypressVersion = await getCurrentCypressVersion().catch(e => {
     checkCypressInstallationSpinner.fail()
@@ -56,38 +59,43 @@ const getCurrentVersion = async () => {
     checkCypressInstallationSpinner.warn('No installed Cypress version detected')
   }
 
+  state.installedVersion = currentCypressVersion
   return currentCypressVersion
 }
 
 /**
  * Checks if the version of Cypress on the machine is up to date.
- * @param {String|false} currentInstalledVersion Currently installed Cypress version on machine.
- * @param {String} currentAvailableVersion Latest available version from Cypress.
+ * @param {Object} state Application State.
  * @returns {Boolean} boolean
  * @async
  */
-const isUpToDate = async (currentInstalledVersion, currentAvailableVersion) => {
+const isUpToDate = async state => {
   let upToDate = false
 
-  if (currentInstalledVersion) {
+  const { installedVersion, latestCypressDetails } = state
+  const currentAvailableVersion = latestCypressDetails.version
+
+  if (installedVersion) {
     compareVersionsSpinner.start()
-    upToDate = await checkIfUpToDate(currentAvailableVersion, currentInstalledVersion).catch(e => {
+    upToDate = await checkIfUpToDate(currentAvailableVersion, installedVersion).catch(e => {
       compareVersionsSpinner.fail()
       throw new Error(e)
     })
 
     if (upToDate) {
-      compareVersionsSpinner.succeed(chalk.greenBright(`v${currentInstalledVersion}`) + ' = ' + chalk.greenBright(`v${currentAvailableVersion}`))
+      compareVersionsSpinner.succeed(chalk.greenBright(`v${installedVersion}`) + ' = ' + chalk.greenBright(`v${currentAvailableVersion}`))
     } else {
-      compareVersionsSpinner.warn(chalk.redBright(`v${currentInstalledVersion}`) + ' < ' + chalk.greenBright(`v${currentAvailableVersion}`))
+      compareVersionsSpinner.warn(chalk.redBright(`v${installedVersion}`) + ' < ' + chalk.greenBright(`v${currentAvailableVersion}`))
     }
   }
 
+  state.isUpToDate = upToDate
   return upToDate
 }
 
 /**
  * Reads the Cypress cache.
+ * @param {Object} state Application State.
  * @returns {Object} Returns object of `cachedVersions` and `cacheLocation`.
  * @async
  */
@@ -105,16 +113,18 @@ const readCache = async () => {
     readCacheSpinner.succeed(`Cypress cache is empty`)
   }
 
+  state.cacheLocation = cacheLocation
+  state.cachedVersions = cachedVersions
   return { cachedVersions, cacheLocation }
 }
 
 /**
  * Cleans out Cypress cache of previous installs.
- * @param {Array} cachedVersions Array of directory version names.
- * @param {String} cacheLocation Path to cache directory.
+ * @param {Object} state Application State.
  * @async
  */
-const cleanCache = async (cachedVersions, cacheLocation) => {
+const cleanCache = async state => {
+  const { cacheLocation, cachedVersions } = state
   clearCacheSpinner.start()
   await clearCache(cacheLocation, cachedVersions).catch(e => {
     clearCacheSpinner.fail()
@@ -125,11 +135,13 @@ const cleanCache = async (cachedVersions, cacheLocation) => {
 
 /**
  * Downloads and saves Cypress.zip
- * @param {String} downloadUrl Url to download.
- * @param {String} version Version of Cypress.
+ * @param {Object} state Application State.
  * @async
  */
-const downloadCypress = async (downloadUrl, version) => {
+const downloadCypress = async state => {
+  const downloadUrl = state.latestCypressDetails.packages[process.platform].url
+  const version = state.latestCypressDetails.version
+
   await download(downloadUrl).catch(e => {
     downloadSpinner.fail()
     throw new Error(e)
@@ -139,10 +151,11 @@ const downloadCypress = async (downloadUrl, version) => {
 
 /**
  * Installs Cypress from the downloaded Cypress.zip
- * @param {String} version Version to install. i.e. 4.0.2
+ * @param {Object} state Application State.
  * @async
  */
-const installCypress = async version => {
+const installCypress = async state => {
+  const version = state.latestCypressDetails.version
   const installSpinner = installCypressSpinner(version)
   installSpinner.start()
   await addCypress(version).catch(e => {
@@ -154,11 +167,12 @@ const installCypress = async version => {
 
 /**
  * Updates Cypress to the latest version available.
- * @param {String} oldVersion Old version.
- * @param {String} newVersion New version.
+ * @param {Object} state Application State.
  * @async
  */
-const updateCypress = async (oldVersion, newVersion) => {
+const updateCypress = async state => {
+  const oldVersion = state.installedVersion
+  const newVersion = state.latestCypressDetails.version
   const updateSpinner = updateCypressSpinner(oldVersion, newVersion)
   updateSpinner.start()
   await addCypress(newVersion).catch(e => {
