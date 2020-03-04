@@ -1,10 +1,10 @@
-import path from "path";
-import semver from "semver";
+import path from 'path'
+import semver from 'semver'
 
-import { cypressUrl } from "../constants";
-import { checkIfFileExists } from "./fileSystem";
-import { execute, spawnProcess } from "./process";
-import { makeRequest } from "./request";
+import { cypressUrl } from '../constants'
+import { checkIfFileExists } from './fileSystem'
+import { execute, spawnProcess } from './process'
+import { makeRequest } from './request'
 
 /**
  * Installs Cypress.
@@ -14,22 +14,22 @@ import { makeRequest } from "./request";
 const addCypress = version =>
   new Promise(async (resolve, reject) => {
     try {
-      const zipPath = path.join(__dirname, "../../Cypress.zip");
-      const fileExists = await checkIfFileExists(zipPath);
+      const zipPath = path.join(__dirname, '../../Cypress.zip')
+      const fileExists = await checkIfFileExists(zipPath)
 
       if (!fileExists) {
-        throw new Error(`${zipPath} does not exist!`);
+        throw new Error(`${zipPath} does not exist!`)
       }
 
-      await spawnProcess("npm install", ["-g", `cypress@${version}`], false, {
+      await spawnProcess('npm install', ['-g', `cypress@${version}`], false, {
         CYPRESS_INSTALL_BINARY: zipPath
-      });
+      })
 
-      return resolve();
+      return resolve()
     } catch (e) {
-      return reject(e);
+      return reject(e)
     }
-  });
+  })
 
 /**
  * Checks if the installed version matches the latest version.
@@ -40,11 +40,11 @@ const addCypress = version =>
 const checkIfUpToDate = (latestVersion, installedVersion) =>
   new Promise((resolve, reject) => {
     try {
-      return resolve(semver.satisfies(installedVersion, `=${latestVersion}`));
+      return resolve(semver.satisfies(installedVersion, `=${latestVersion}`))
     } catch (e) {
-      return reject(e);
+      return reject(e)
     }
-  });
+  })
 
 /**
  * Gets version number of installed Cypress version, or returns false.
@@ -53,18 +53,18 @@ const checkIfUpToDate = (latestVersion, installedVersion) =>
 const getCurrentCypressVersion = () =>
   new Promise(async (resolve, reject) => {
     try {
-      const stdout = await execute(`npm list -g --depth 0 cypress`);
-      const index = stdout.indexOf("── ");
+      const stdout = await execute(`npm list -g --depth 0 cypress`)
+      const index = stdout.indexOf('── ')
       return resolve(
         stdout
           .slice(index + 3, stdout.length)
           .trim()
-          .replace("cypress@", "")
-      );
+          .replace('cypress@', '')
+      )
     } catch (e) {
-      return resolve(false);
+      return resolve(false)
     }
-  });
+  })
 
 /**
  * Get's latest Cypress details from download url.
@@ -72,16 +72,16 @@ const getCurrentCypressVersion = () =>
 const getLatestCypressDetails = () =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await makeRequest(cypressUrl);
-      return resolve(response);
+      const response = await makeRequest(cypressUrl)
+      return resolve(response)
     } catch (e) {
-      return reject(e);
+      return reject(e)
     }
-  });
+  })
 
 module.exports = {
   addCypress,
   checkIfUpToDate,
   getCurrentCypressVersion,
   getLatestCypressDetails
-};
+}

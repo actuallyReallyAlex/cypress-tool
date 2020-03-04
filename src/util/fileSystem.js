@@ -1,6 +1,6 @@
-import fs from "fs";
-import path from "path";
-import rimraf from "rimraf";
+import fs from 'fs'
+import path from 'path'
+import rimraf from 'rimraf'
 
 /**
  * Iterates over an array and calls a function on each element.
@@ -12,13 +12,13 @@ const asyncForEach = (array, callback) =>
   new Promise(async (resolve, reject) => {
     try {
       for (let index = 0; index < array.length; index++) {
-        await callback(array[index], index, array);
+        await callback(array[index], index, array)
       }
-      return resolve();
+      return resolve()
     } catch (e) {
-      return reject(e);
+      return reject(e)
     }
-  });
+  })
 
 /**
  * Checks if a file or directory exists.
@@ -29,11 +29,11 @@ const checkIfFileExists = path =>
   new Promise((resolve, reject) => {
     fs.stat(path, (err, stats) => {
       if (err) {
-        return resolve(false);
+        return resolve(false)
       }
-      return resolve(stats);
-    });
-  });
+      return resolve(stats)
+    })
+  })
 
 // TODO - Make more dynamic
 /**
@@ -45,16 +45,13 @@ const checkIfFileExists = path =>
 const clearCache = (cache, cachedVersions) =>
   new Promise(async (resolve, reject) => {
     try {
-      await asyncForEach(
-        cachedVersions,
-        async version => await removeFile(path.join(cache, `/${version}`))
-      );
+      await asyncForEach(cachedVersions, async version => await removeFile(path.join(cache, `/${version}`)))
 
-      resolve();
+      resolve()
     } catch (e) {
-      return reject(e);
+      return reject(e)
     }
-  });
+  })
 
 /**
  * Gets the versions that are currently cached.
@@ -64,23 +61,23 @@ const clearCache = (cache, cachedVersions) =>
 const getCachedVersions = cachePath =>
   new Promise(async (resolve, reject) => {
     try {
-      const exists = await checkIfFileExists(cachePath);
+      const exists = await checkIfFileExists(cachePath)
 
       if (exists) {
         fs.readdir(cachePath, (err, files) => {
           if (err) {
-            return reject(err);
+            return reject(err)
           }
 
-          return resolve(files);
-        });
+          return resolve(files)
+        })
       } else {
-        return resolve([]);
+        return resolve([])
       }
     } catch (e) {
-      return reject(e);
+      return reject(e)
     }
-  });
+  })
 
 /**
  * Deletes a directory or file recursively.
@@ -92,14 +89,14 @@ const removeFile = file =>
     try {
       rimraf(file, error => {
         if (error) {
-          return reject(error);
+          return reject(error)
         }
-        resolve();
-      });
+        resolve()
+      })
     } catch (e) {
-      return reject(e);
+      return reject(e)
     }
-  });
+  })
 
 // TODO - Make this more dynamic
 /**
@@ -111,15 +108,15 @@ const removeFile = file =>
 const saveFile = (res, bar) =>
   new Promise((resolve, reject) => {
     try {
-      const fileStream = fs.createWriteStream("./Cypress.zip");
-      res.body.pipe(fileStream);
-      res.body.on("error", err => reject(err));
-      res.body.on("data", chunk => bar.tick(chunk.length));
-      fileStream.on("finish", () => resolve());
+      const fileStream = fs.createWriteStream('./Cypress.zip')
+      res.body.pipe(fileStream)
+      res.body.on('error', err => reject(err))
+      res.body.on('data', chunk => bar.tick(chunk.length))
+      fileStream.on('finish', () => resolve())
     } catch (e) {
-      return reject(e);
+      return reject(e)
     }
-  });
+  })
 
 module.exports = {
   checkIfFileExists,
@@ -127,4 +124,4 @@ module.exports = {
   getCachedVersions,
   removeFile,
   saveFile
-};
+}

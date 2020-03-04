@@ -1,8 +1,8 @@
-import fetch from "node-fetch";
-import httpsProxyAgent from "https-proxy-agent";
-import ProgressBar from "progress";
+import fetch from 'node-fetch'
+import httpsProxyAgent from 'https-proxy-agent'
+import ProgressBar from 'progress'
 
-import { saveFile } from "./fileSystem";
+import { saveFile } from './fileSystem'
 
 /**
  * Downloads and saves a file.
@@ -13,27 +13,25 @@ const download = url =>
   new Promise((resolve, reject) => {
     try {
       fetch(url, {
-        agent: process.env.HTTP_PROXY
-          ? new httpsProxyAgent(process.env.HTTP_PROXY)
-          : undefined
+        agent: process.env.HTTP_PROXY ? new httpsProxyAgent(process.env.HTTP_PROXY) : undefined
       })
         .then(async response => {
-          const contentLength = await response.headers.get("content-length");
-          const bar = new ProgressBar("Downloading [:bar] :percent :etas", {
-            complete: "=",
-            incomplete: " ",
+          const contentLength = await response.headers.get('content-length')
+          const bar = new ProgressBar('Downloading [:bar] :percent :etas', {
+            complete: '=',
+            incomplete: ' ',
             width: 50,
             total: Number(contentLength)
-          });
+          })
 
-          await saveFile(response, bar);
-          resolve();
+          await saveFile(response, bar)
+          resolve()
         })
-        .catch(e => reject(e));
+        .catch(e => reject(e))
     } catch (e) {
-      return reject(e);
+      return reject(e)
     }
-  });
+  })
 
 /**
  * Makes a request to a url.
@@ -45,9 +43,9 @@ const makeRequest = (
   url,
   options = {
     headers: {
-      "Content-Type": "application/json"
+      'Content-Type': 'application/json'
     },
-    method: "GET"
+    method: 'GET'
   }
 ) =>
   new Promise((resolve, reject) => {
@@ -55,15 +53,13 @@ const makeRequest = (
       fetch(url, {
         headers: options.headers,
         method: options.method,
-        agent: process.env.HTTP_PROXY
-          ? new httpsProxyAgent(process.env.HTTP_PROXY)
-          : undefined
+        agent: process.env.HTTP_PROXY ? new httpsProxyAgent(process.env.HTTP_PROXY) : undefined
       })
         .then(response => resolve(response.json()))
-        .catch(e => reject(e));
+        .catch(e => reject(e))
     } catch (e) {
-      return reject(e);
+      return reject(e)
     }
-  });
+  })
 
-module.exports = { download, makeRequest };
+module.exports = { download, makeRequest }
