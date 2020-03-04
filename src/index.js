@@ -18,7 +18,7 @@ import {
   interpretMenuAction
 } from './steps'
 
-// TODO - ClearCache Action
+// * Prioritized TODOs
 // TODO - Need an event emitter to hanlde repeat visits to Main Menu
 // TODO - package version number in title
 // TODO - On Main Menu -> Yellow if InstalledVersion could be updated. Green if isUpToDate
@@ -26,12 +26,16 @@ import {
 // TODO - Use pkg to compile into an executable
 // TODO - Allow to download/install older Cypress versions as well
 // TODO - Option to install locally as dev dependency
+// TODO - Cooler name than 'Cypress Tool'
+
+// * Not Prioritized TODOs
+// TODO - Persist app state with configstore for a faster app
 
 const main = async () => {
   try {
     const state = {
       cacheLocation: null,
-      cachedVersions: null,
+      cachedVersions: [],
       installedVersion: null,
       isUpToDate: null,
       latestCypressDetails: null,

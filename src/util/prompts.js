@@ -11,24 +11,30 @@ import { generateMainMenu } from './title'
 const displayMainMenu = state =>
   new Promise(async (resolve, reject) => {
     try {
-      const { installedVersion, isUpToDate, latestCypressDetails } = state
+      const { cachedVersions, installedVersion, isUpToDate, latestCypressDetails } = state
       const latestAvailableVersion = latestCypressDetails.version
       await generateMainMenu(installedVersion, latestAvailableVersion)
+
       const choices = []
 
       if (!installedVersion) {
         choices.push({ name: 'Install Cypress', value: 'install' })
       }
 
-      // TODO - If upToDate, should not have option to UpdateCypress
-      // * but can downgrade if want
       if (installedVersion && !isUpToDate) {
         choices.push({ name: 'Update Cypress', value: 'update' })
       }
 
       choices.push(new inquirer.Separator())
-      choices.push({ name: 'Uninstall Cypress', value: 'uninstall' })
-      choices.push({ name: 'Clear Cypress Cache', value: 'clearCache' })
+
+      if (installedVersion) {
+        choices.push({ name: 'Uninstall Cypress', value: 'uninstall' })
+      }
+
+      if (cachedVersions && cachedVersions.length > 0) {
+        choices.push({ name: 'Clear Cypress Cache', value: 'clearCache' })
+      }
+
       choices.push(new inquirer.Separator())
       choices.push({ name: 'Exit', value: 'exit' })
 

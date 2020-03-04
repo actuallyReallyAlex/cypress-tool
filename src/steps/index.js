@@ -132,6 +132,7 @@ const cleanCache = async state => {
     clearCacheSpinner.fail()
     throw new Error(e)
   })
+  state.cachedVersions = []
   clearCacheSpinner.succeed('Cache cleared')
 }
 
@@ -167,6 +168,7 @@ const installCypress = async state => {
   state.installedVersion = version
   // TODO - Probably need to make this more dynamic to handle installing out of date versions.
   state.isUpToDate = true
+  state.cachedVersions.push(version)
   installSpinner.succeed(`Installed Cypress ${chalk.yellowBright('v' + version)}`)
 }
 
@@ -212,8 +214,12 @@ const interpretMenuAction = async state => {
   const { menuAction } = state
 
   const actions = {
-    clearCache: () => {
-      console.log(chalk.redBright('TODO - ClearCache Action'))
+    clearCache: async () => {
+      await readCache(state)
+      await cleanCache(state)
+      await displayMainMenu(state)
+      console.log(chalk.redBright('Need to create an event emitter to handle repeat visits to main menu'))
+      // TODO - Need a way to call interpretMenuAction now too...
     },
     exit: () => process.exit(0),
     install: async () => {
