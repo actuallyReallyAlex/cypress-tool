@@ -1,6 +1,8 @@
 import chalk from 'chalk'
 import inquirer from 'inquirer'
 
+import { generateMainMenu } from './title'
+
 /**
  * Displays Main Menu based on current app state.
  * @param {String|false} installedVersion Currently installed version of Cypress, or false if no version is installed.
@@ -11,12 +13,15 @@ import inquirer from 'inquirer'
 const displayMainMenu = (installedVersion, upToDate, latestCypressDetails) =>
   new Promise(async (resolve, reject) => {
     try {
+      await generateMainMenu(installedVersion, latestCypressDetails.version)
       const choices = []
 
       if (!installedVersion) {
         choices.push('Install Cypress')
       }
 
+      // TODO - If upToDate, should not have option to UpdateCypress
+      // * but can downgrade if want
       if (installedVersion && !upToDate) {
         choices.push('Update Cypress')
       }
