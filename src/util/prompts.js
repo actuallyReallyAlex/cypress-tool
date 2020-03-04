@@ -29,6 +29,8 @@ const displayMainMenu = state =>
       choices.push(new inquirer.Separator())
       choices.push({ name: 'Uninstall Cypress', value: 'uninstall' })
       choices.push({ name: 'Clear Cypress Cache', value: 'clearCache' })
+      choices.push(new inquirer.Separator())
+      choices.push({ name: 'Exit', value: 'exit' })
 
       const { menuAction } = await inquirer.prompt([
         {

@@ -213,6 +213,7 @@ const interpretMenuAction = async state => {
     clearCache: () => {
       console.log(chalk.redBright('TODO - ClearCache Action'))
     },
+    exit: () => process.exit(0),
     install: () => {
       console.log(chalk.redBright('TODO - Install Action'))
     },
