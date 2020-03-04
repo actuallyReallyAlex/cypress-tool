@@ -5,66 +5,71 @@ import figlet from 'figlet'
 import { version } from '../../package.json'
 
 /**
+ * Blank style applied to Boxen.
+ */
+const blankBoxenStyle = {
+  borderStyle: {
+    topLeft: ' ',
+    topRight: ' ',
+    bottomLeft: ' ',
+    bottomRight: ' ',
+    horizontal: ' ',
+    vertical: ' '
+  },
+  float: 'center',
+  padding: { top: 0, bottom: 0, right: 1, left: 1 }
+}
+
+/**
+ * Default style applied to Boxen.
+ */
+const defaultBoxenStyle = {
+  borderColor: 'magentaBright',
+  borderStyle: 'round',
+  float: 'center',
+  padding: { top: 0, bottom: 0, right: 1, left: 1 }
+}
+
+/**
+ * Uses Figlet to transform your text to ASCII.
+ * @param {String} txt Text to be figlet-itized.
+ * @param {Object} options Options object.
+ * @returns {Promise} Resolves with text.
+ */
+const figletPromise = (txt, options = {}) =>
+  new Promise((resolve, reject) => {
+    try {
+      figlet.text(txt, options, (error, result) => {
+        if (error) {
+          return reject(error)
+        }
+
+        return resolve(result)
+      })
+    } catch (e) {
+      return reject(e)
+    }
+  })
+
+/**
  * Generates the About Page.
  * @returns {Promise} Resolves after logging to the console.
  */
 const generateAboutPage = () =>
-  new Promise((resolve, reject) => {
+  new Promise(async (resolve, reject) => {
     try {
       clear()
-      figlet.text(
-        'Cypress Tool',
-        {
-          font: 'slant'
-        },
-        (error, result) => {
-          if (error) {
-            return reject(error)
-          }
+      const text = await figletPromise('Cypress Tool', { font: 'slant' })
+      const versionText = `${chalk.yellowBright('v' + version)}`
+      const authorText = `Author: ${chalk.greenBright('Alex Lee')}`
 
-          const versionText = `${chalk.yellowBright('v' + version)}`
-          const authorText = `Author: ${chalk.greenBright('Alex Lee')}`
-
-          console.log(
-            boxen(chalk.blueBright(result), {
-              borderColor: 'magentaBright',
-              borderStyle: 'round',
-              float: 'center',
-              padding: { top: 0, bottom: 0, right: 1, left: 1 }
-            })
-          )
-          console.log(
-            boxen(versionText, {
-              borderStyle: {
-                topLeft: ' ',
-                topRight: ' ',
-                bottomLeft: ' ',
-                bottomRight: ' ',
-                horizontal: ' ',
-                vertical: ' '
-              },
-              float: 'center',
-              padding: { top: 0, bottom: 0, right: 1, left: 1 }
-            })
-          )
-          console.log(
-            boxen(authorText, {
-              borderStyle: {
-                topLeft: ' ',
-                topRight: ' ',
-                bottomLeft: ' ',
-                bottomRight: ' ',
-                horizontal: ' ',
-                vertical: ' '
-              },
-              float: 'center',
-              padding: { top: 0, bottom: 0, right: 1, left: 1 }
-            })
-          )
-          return resolve()
-        }
-      )
-    } catch (e) {}
+      console.log(boxen(chalk.blueBright(text), defaultBoxenStyle))
+      console.log(boxen(versionText, blankBoxenStyle))
+      console.log(boxen(authorText, blankBoxenStyle))
+      return resolve()
+    } catch (e) {
+      return reject(e)
+    }
   })
 
 /**
@@ -73,54 +78,23 @@ const generateAboutPage = () =>
  * @returns {Promise} Resolves after logging to the console.
  */
 const generateMainMenu = state =>
-  new Promise((resolve, reject) => {
+  new Promise(async (resolve, reject) => {
     try {
       clear()
-      figlet.text(
-        'Cypress Tool',
-        {
-          font: 'slant'
-        },
-        (error, result) => {
-          if (error) {
-            return reject(error)
-          }
+      const text = await figletPromise('Cypress Tool', { font: 'slant' })
+      const { installedVersion, isUpToDate, latestCypressDetails } = state
+      const latestAvailableVersion = latestCypressDetails.version
 
-          const { installedVersion, isUpToDate, latestCypressDetails } = state
-          const latestAvailableVersion = latestCypressDetails.version
+      const installedVersionText = installedVersion
+        ? `Installed Version: ${isUpToDate ? chalk.greenBright('v' + installedVersion) : chalk.yellowBright('v' + installedVersion)}     |     `
+        : `Installed Version: ${chalk.yellowBright('---')}     |     `
+      const latestVersionText = `Latest Available Version: ${chalk.greenBright('v' + latestAvailableVersion)}`
 
-          const installedVersionText = installedVersion
-            ? `Installed Version: ${isUpToDate ? chalk.greenBright('v' + installedVersion) : chalk.yellowBright('v' + installedVersion)}     |     `
-            : `Installed Version: ${chalk.yellowBright('---')}     |     `
-          const latestVersionText = `Latest Available Version: ${chalk.greenBright('v' + latestAvailableVersion)}`
+      const detailsText = installedVersionText + latestVersionText
 
-          const detailsText = installedVersionText + latestVersionText
-
-          console.log(
-            boxen(chalk.blueBright(result), {
-              borderColor: 'magentaBright',
-              borderStyle: 'round',
-              float: 'center',
-              padding: { top: 0, bottom: 0, right: 1, left: 1 }
-            })
-          )
-          console.log(
-            boxen(detailsText, {
-              borderStyle: {
-                topLeft: ' ',
-                topRight: ' ',
-                bottomLeft: ' ',
-                bottomRight: ' ',
-                horizontal: ' ',
-                vertical: ' '
-              },
-              float: 'center',
-              padding: { top: 0, bottom: 0, right: 1, left: 1 }
-            })
-          )
-          return resolve()
-        }
-      )
+      console.log(boxen(chalk.blueBright(text), defaultBoxenStyle))
+      console.log(boxen(detailsText, blankBoxenStyle))
+      return resolve()
     } catch (e) {
       return reject(e)
     }
@@ -132,30 +106,15 @@ const generateMainMenu = state =>
  * @returns {Promise} Resolves after logging to the console.
  */
 const generateTitle = title =>
-  new Promise((resolve, reject) => {
-    clear()
-    figlet.text(
-      title,
-      {
-        font: 'slant'
-      },
-      (error, result) => {
-        if (error) {
-          console.error(error)
-          resolve()
-        }
-
-        console.log(
-          boxen(chalk.blueBright(result), {
-            borderColor: 'magentaBright',
-            borderStyle: 'round',
-            float: 'center',
-            padding: { top: 0, bottom: 0, right: 1, left: 1 }
-          })
-        )
-        return resolve()
-      }
-    )
+  new Promise(async (resolve, reject) => {
+    try {
+      clear()
+      const text = await figletPromise(title, { font: 'slant' })
+      console.log(boxen(chalk.blueBright(text), defaultBoxenStyle))
+      return resolve()
+    } catch (e) {
+      return reject(e)
+    }
   })
 
 module.exports = { generateAboutPage, generateMainMenu, generateTitle }
