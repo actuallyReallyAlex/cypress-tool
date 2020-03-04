@@ -21,6 +21,8 @@ import {
   interpretMenuAction
 } from './steps'
 
+import { initializeDirectory } from './util/fileSystem'
+
 // * Prioritized TODOs
 // TODO - Use pkg to compile into an executable
 // TODO - Allow to download/install older Cypress versions as well
@@ -29,6 +31,8 @@ import {
 // TODO - Persist app state with configstore for a faster app
 
 // * Not Prioritized TODOs
+// TODO - Put CypressTool directory path into state
+// TODO - Put some constants like isMac into state
 
 const main = async () => {
   try {
@@ -52,6 +56,9 @@ const main = async () => {
       shouldInstall: null,
       shouldUpdate: null
     }
+
+    // * Init CypressTool Directory
+    await initializeDirectory()
 
     // * Title
     await title()
@@ -116,4 +123,4 @@ const main = async () => {
   }
 }
 
-main()
+module.exports = main
