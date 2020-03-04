@@ -18,16 +18,16 @@ import {
   interpretMenuAction
 } from './steps'
 
-// TODO - Allow to download/install older Cypress versions as well
-// TODO - Add Sentry error tracking
-// TODO - Option to install locally as dev dependency
-// TODO - package version number in title
-// TODO - ClearCache Action
 // TODO - Install Action
 // TODO - Update Action
-// TODO - On Main Menu -> Yellow if InstalledVersion could be updated. Green if isUpToDate
+// TODO - ClearCache Action
 // TODO - Need an event emitter to hanlde repeat visits to Main Menu
+// TODO - package version number in title
+// TODO - On Main Menu -> Yellow if InstalledVersion could be updated. Green if isUpToDate
+// TODO - Add Sentry error tracking
 // TODO - Use pkg to compile into an executable
+// TODO - Allow to download/install older Cypress versions as well
+// TODO - Option to install locally as dev dependency
 
 const main = async () => {
   try {
