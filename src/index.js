@@ -8,7 +8,6 @@ import { promptToInstallCypress, promptToUpdateCypress } from './util/prompts'
 import { title, getLatestDetails, getCurrentVersion, isUpToDate, readCache, cleanCache, downloadCypress, installCypress, updateCypress } from './steps'
 
 // TODO - Allow to download/install older Cypress versions as well
-// TODO - Chalk-ify some important things to the terminal, like version numbers etc.
 // TODO - Abiility to uninstall Cypress
 
 const main = async () => {
