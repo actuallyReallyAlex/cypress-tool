@@ -69,7 +69,8 @@ const main = async () => {
       }
     }
 
-    const menuOption = await displayMainMenu(currentCypressVersion, upToDate, latestCypressDetails)
+    const reCheckCypressVersion = await getCurrentVersion()
+    const menuOption = await displayMainMenu(reCheckCypressVersion, upToDate, latestCypressDetails)
     console.log({ menuOption })
   } catch (e) {
     console.log(chalk.red(e))
