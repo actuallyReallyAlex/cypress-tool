@@ -69,11 +69,10 @@ const generateAboutPage = () =>
 
 /**
  * Generates a pretty main menu title screen with relavent info.
- * @param {String|false} installedVersion Currently installed version of Cypress, or false if no version is installed.
- * @param {String} latestAvailableVersion Latest available version from Cypress.
+ * @param {Object} state Application state.
  * @returns {Promise} Resolves after logging to the console.
  */
-const generateMainMenu = (installedVersion, latestAvailableVersion) =>
+const generateMainMenu = state =>
   new Promise((resolve, reject) => {
     try {
       clear()
@@ -87,10 +86,13 @@ const generateMainMenu = (installedVersion, latestAvailableVersion) =>
             return reject(error)
           }
 
+          const { installedVersion, isUpToDate, latestCypressDetails } = state
+          const latestAvailableVersion = latestCypressDetails.version
+
           const installedVersionText = installedVersion
-            ? `Installed Version: ${chalk.yellowBright('v' + installedVersion)}     |     `
+            ? `Installed Version: ${isUpToDate ? chalk.greenBright('v' + installedVersion) : chalk.yellowBright('v' + installedVersion)}     |     `
             : `Installed Version: ${chalk.yellowBright('---')}     |     `
-          const latestVersionText = `Latest Available Version: ${chalk.yellowBright('v' + latestAvailableVersion)}`
+          const latestVersionText = `Latest Available Version: ${chalk.greenBright('v' + latestAvailableVersion)}`
 
           const detailsText = installedVersionText + latestVersionText
 
