@@ -20,7 +20,6 @@ import {
 } from './steps'
 
 // * Prioritized TODOs
-// ! TODO - Fix double bar separator on menu
 // TODO - Clean up title.js (lots of reusable stuff there I think)
 // TODO - Add Sentry error tracking
 // TODO - Use pkg to compile into an executable

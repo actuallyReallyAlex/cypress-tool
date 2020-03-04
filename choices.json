@@ -1,0 +1,12 @@
+{
+  "choices": [
+    {
+      "name": "Install Cypress",
+      "value": "install"
+    },
+    {
+      "type": "separator",
+      "line": "\u001b[2m──────────────\u001b[22m"
+    }
+  ]
+}

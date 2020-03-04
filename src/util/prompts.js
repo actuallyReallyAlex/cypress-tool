@@ -1,5 +1,6 @@
 import chalk from 'chalk'
 import inquirer from 'inquirer'
+import fs from 'fs'
 
 import { generateAboutPage, generateMainMenu } from './title'
 
@@ -40,7 +41,9 @@ const displayMainMenu = state =>
         choices.push({ name: 'Update Cypress', value: 'update' })
       }
 
-      choices.push(new inquirer.Separator())
+      if (choices.length > 0) {
+        choices.push(new inquirer.Separator())
+      }
 
       if (installedVersion) {
         choices.push({ name: 'Uninstall Cypress', value: 'uninstall' })
@@ -50,7 +53,10 @@ const displayMainMenu = state =>
         choices.push({ name: 'Clear Cypress Cache', value: 'clearCache' })
       }
 
-      choices.push(new inquirer.Separator())
+      if (choices.findIndex(choice => choice.type === 'separator') === -1) {
+        choices.push(new inquirer.Separator())
+      }
+
       choices.push({ name: 'About', value: 'about' })
       choices.push({ name: 'Exit', value: 'exit' })
 
