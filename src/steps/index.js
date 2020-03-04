@@ -4,6 +4,7 @@ import path from 'path'
 import { isMac } from '../constants'
 import { addCypress, checkIfUpToDate, getCurrentCypressVersion, getLatestCypressDetails, removeCypress } from '../util/cypress'
 import { clearCache, getCachedVersions } from '../util/fileSystem'
+import { displayAboutMenu } from '../util/prompts'
 import { download } from '../util/request'
 import {
   checkCypressInstallationSpinner,
@@ -213,6 +214,10 @@ const interpretMenuAction = async state => {
   const { menuAction } = state
 
   const actions = {
+    about: async () => {
+      await displayAboutMenu()
+      state.menuActionEmitter.emit('actionCompleted', state)
+    },
     clearCache: async () => {
       await readCache(state)
       await cleanCache(state)

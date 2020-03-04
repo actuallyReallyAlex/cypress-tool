@@ -2,6 +2,70 @@ import boxen from 'boxen'
 import chalk from 'chalk'
 import clear from 'clear'
 import figlet from 'figlet'
+import { version } from '../../package.json'
+
+/**
+ * Generates the About Page.
+ * @returns {Promise} Resolves after logging to the console.
+ */
+const generateAboutPage = () =>
+  new Promise((resolve, reject) => {
+    try {
+      clear()
+      figlet.text(
+        'Cypress Tool',
+        {
+          font: 'slant'
+        },
+        (error, result) => {
+          if (error) {
+            return reject(error)
+          }
+
+          const versionText = `${chalk.yellowBright('v' + version)}`
+          const authorText = `Author: ${chalk.greenBright('Alex Lee')}`
+
+          console.log(
+            boxen(chalk.blueBright(result), {
+              borderColor: 'magentaBright',
+              borderStyle: 'round',
+              float: 'center',
+              padding: { top: 0, bottom: 0, right: 1, left: 1 }
+            })
+          )
+          console.log(
+            boxen(versionText, {
+              borderStyle: {
+                topLeft: ' ',
+                topRight: ' ',
+                bottomLeft: ' ',
+                bottomRight: ' ',
+                horizontal: ' ',
+                vertical: ' '
+              },
+              float: 'center',
+              padding: { top: 0, bottom: 0, right: 1, left: 1 }
+            })
+          )
+          console.log(
+            boxen(authorText, {
+              borderStyle: {
+                topLeft: ' ',
+                topRight: ' ',
+                bottomLeft: ' ',
+                bottomRight: ' ',
+                horizontal: ' ',
+                vertical: ' '
+              },
+              float: 'center',
+              padding: { top: 0, bottom: 0, right: 1, left: 1 }
+            })
+          )
+          return resolve()
+        }
+      )
+    } catch (e) {}
+  })
 
 /**
  * Generates a pretty main menu title screen with relavent info.
@@ -92,4 +156,4 @@ const generateTitle = title =>
     )
   })
 
-module.exports = { generateMainMenu, generateTitle }
+module.exports = { generateAboutPage, generateMainMenu, generateTitle }

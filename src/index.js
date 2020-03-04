@@ -20,7 +20,6 @@ import {
 } from './steps'
 
 // * Prioritized TODOs
-// TODO - About page
 // TODO - On Main Menu -> Yellow if InstalledVersion could be updated. Green if isUpToDate
 // TODO - Add Sentry error tracking
 // TODO - Use pkg to compile into an executable
@@ -30,6 +29,8 @@ import {
 
 // * Not Prioritized TODOs
 // TODO - Persist app state with configstore for a faster app
+// ! TODO - Fix double bar separator on menu
+// TODO - Clean up title.js (lots of reusable stuff there I think)
 
 const main = async () => {
   try {
