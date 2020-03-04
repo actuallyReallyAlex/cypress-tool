@@ -26,7 +26,6 @@ import {
 // TODO - Install Action
 // TODO - Update Action
 // TODO - On Main Menu -> Yellow if InstalledVersion could be updated. Green if isUpToDate
-// TODO - Exit menu option
 // TODO - Need an event emitter to hanlde repeat visits to Main Menu
 // TODO - Use pkg to compile into an executable
 
