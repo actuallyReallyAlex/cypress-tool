@@ -27,9 +27,8 @@ const displayAboutMenu = () =>
 const displayMainMenu = state =>
   new Promise(async (resolve, reject) => {
     try {
-      const { cachedVersions, installedVersion, isUpToDate, latestCypressDetails } = state
-      const latestAvailableVersion = latestCypressDetails.version
-      await generateMainMenu(installedVersion, latestAvailableVersion)
+      const { cachedVersions, installedVersion, isUpToDate } = state
+      await generateMainMenu(state)
 
       const choices = []
 
