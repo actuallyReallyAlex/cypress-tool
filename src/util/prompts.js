@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import inquirer from "inquirer";
 
 /**
@@ -11,7 +12,9 @@ const promptToInstallCypress = latestVersion =>
       const { shouldInstall } = await inquirer.prompt([
         {
           type: "confirm",
-          message: `Would you like to install Cypress v${latestVersion}?`,
+          message: `Would you like to install Cypress ${chalk.yellowBright(
+            "v" + latestVersion
+          )}?`,
           name: "shouldInstall"
         }
       ]);
@@ -34,7 +37,9 @@ const promptToUpdateCypress = (oldVersion, newVersion) =>
       const { shouldUpdate } = await inquirer.prompt([
         {
           type: "confirm",
-          message: `Would you like to update your Cypress installation from v${oldVersion} to v${newVersion}?`,
+          message: `Would you like to update your Cypress installation from ${chalk.yellowBright(
+            "v" + oldVersion
+          )} to ${chalk.yellowBright("v" + newVersion)}?`,
           name: "shouldUpdate"
         }
       ]);
