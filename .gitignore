@@ -106,3 +106,8 @@ dist
 Cypress.zip
 
 lib/
+
+cypress-tool
+cypress-tool-linux
+cypress-tool-macos
+cypress-tool-win.exe

@@ -2,6 +2,8 @@ import fs from 'fs'
 import path from 'path'
 import rimraf from 'rimraf'
 
+import { isMac } from '../constants'
+
 /**
  * Iterates over an array and calls a function on each element.
  * @param {Array} array Array to iterate over.
@@ -27,12 +29,16 @@ const asyncForEach = (array, callback) =>
  */
 const checkIfFileExists = path =>
   new Promise((resolve, reject) => {
-    fs.stat(path, (err, stats) => {
-      if (err) {
-        return resolve(false)
-      }
-      return resolve(stats)
-    })
+    try {
+      fs.stat(path, (err, stats) => {
+        if (err) {
+          return resolve(false)
+        }
+        return resolve(stats)
+      })
+    } catch (e) {
+      return reject(e)
+    }
   })
 
 // TODO - Make more dynamic
@@ -80,6 +86,32 @@ const getCachedVersions = cachePath =>
   })
 
 /**
+ * Initializes CypressTool directory.
+ * @returns {Promise} Resolvese after directory has been created, or if it's already created.
+ */
+const initializeDirectory = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const dirPath = isMac ? path.join(process.env.HOME, '/CypressTool') : path.join(process.env.TEMP, '/CypressTool')
+      const dir = await checkIfFileExists(dirPath)
+
+      if (!dir) {
+        // * Create directory
+        fs.mkdir(dirPath, err => {
+          if (err) {
+            return reject(err)
+          }
+          resolve()
+        })
+      } else {
+        return resolve()
+      }
+    } catch (e) {
+      return reject(e)
+    }
+  })
+
+/**
  * Deletes a directory or file recursively.
  * @param {String} file String to file/directory to be removed.
  * @returns {Promise}
@@ -108,7 +140,9 @@ const removeFile = file =>
 const saveFile = (res, bar) =>
   new Promise((resolve, reject) => {
     try {
-      const fileStream = fs.createWriteStream('./Cypress.zip')
+      // fs.writeFile('env.json', JSON.stringify({ env: process.env }, null, 2), err => {})
+      const zipPath = path.join(process.env.HOME, '/CypressTool/Cypress.zip')
+      const fileStream = fs.createWriteStream(zipPath)
       res.body.pipe(fileStream)
       res.body.on('error', err => reject(err))
       res.body.on('data', chunk => bar.tick(chunk.length))
@@ -122,6 +156,7 @@ module.exports = {
   checkIfFileExists,
   clearCache,
   getCachedVersions,
+  initializeDirectory,
   removeFile,
   saveFile
 }

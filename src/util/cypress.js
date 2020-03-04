@@ -14,7 +14,7 @@ import { makeRequest } from './request'
 const addCypress = version =>
   new Promise(async (resolve, reject) => {
     try {
-      const zipPath = path.join(__dirname, '../../Cypress.zip')
+      const zipPath = isMac ? path.join(process.env.HOME, '/CypressTool') : path.join(process.env.TEMP, '/CypressTool')
       const fileExists = await checkIfFileExists(zipPath)
 
       if (!fileExists) {

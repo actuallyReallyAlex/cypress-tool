@@ -23,7 +23,13 @@ import { generateTitle } from '../util/title'
  * Generates a pretty title.
  * @async
  */
-const title = async () => await generateTitle('Cypress Tool')
+const title = async () => {
+  try {
+    await generateTitle('Cypress Tool')
+  } catch (e) {
+    throw new Error()
+  }
+}
 
 /**
  * Gets latest Cypress details.
@@ -32,14 +38,18 @@ const title = async () => await generateTitle('Cypress Tool')
  * @async
  */
 const getLatestDetails = async state => {
-  getLatestCypressDetailsSpinner.start()
-  const latestCypressDetails = await getLatestCypressDetails().catch(e => {
-    getLatestCypressDetailsSpinner.fail()
+  try {
+    getLatestCypressDetailsSpinner.start()
+    const latestCypressDetails = await getLatestCypressDetails().catch(e => {
+      getLatestCypressDetailsSpinner.fail()
+      throw new Error(e)
+    })
+    getLatestCypressDetailsSpinner.succeed(`Latest Cypress release is ${chalk.yellowBright('v' + latestCypressDetails.version)}`)
+    state.latestCypressDetails = latestCypressDetails
+    return latestCypressDetails
+  } catch (e) {
     throw new Error(e)
-  })
-  getLatestCypressDetailsSpinner.succeed(`Latest Cypress release is ${chalk.yellowBright('v' + latestCypressDetails.version)}`)
-  state.latestCypressDetails = latestCypressDetails
-  return latestCypressDetails
+  }
 }
 
 /**
@@ -49,20 +59,24 @@ const getLatestDetails = async state => {
  * @async
  */
 const getCurrentVersion = async state => {
-  checkCypressInstallationSpinner.start()
-  const currentCypressVersion = await getCurrentCypressVersion().catch(e => {
-    checkCypressInstallationSpinner.fail()
+  try {
+    checkCypressInstallationSpinner.start()
+    const currentCypressVersion = await getCurrentCypressVersion().catch(e => {
+      checkCypressInstallationSpinner.fail()
+      throw new Error(e)
+    })
+
+    if (currentCypressVersion) {
+      checkCypressInstallationSpinner.succeed(`Installed version is ${chalk.yellowBright(currentCypressVersion)}`)
+    } else {
+      checkCypressInstallationSpinner.warn('No installed Cypress version detected')
+    }
+
+    state.installedVersion = currentCypressVersion
+    return currentCypressVersion
+  } catch (e) {
     throw new Error(e)
-  })
-
-  if (currentCypressVersion) {
-    checkCypressInstallationSpinner.succeed(`Installed version is ${chalk.yellowBright(currentCypressVersion)}`)
-  } else {
-    checkCypressInstallationSpinner.warn('No installed Cypress version detected')
   }
-
-  state.installedVersion = currentCypressVersion
-  return currentCypressVersion
 }
 
 /**
@@ -72,27 +86,31 @@ const getCurrentVersion = async state => {
  * @async
  */
 const isUpToDate = async state => {
-  let upToDate = false
+  try {
+    let upToDate = false
 
-  const { installedVersion, latestCypressDetails } = state
-  const currentAvailableVersion = latestCypressDetails.version
+    const { installedVersion, latestCypressDetails } = state
+    const currentAvailableVersion = latestCypressDetails.version
 
-  if (installedVersion) {
-    compareVersionsSpinner.start()
-    upToDate = await checkIfUpToDate(currentAvailableVersion, installedVersion).catch(e => {
-      compareVersionsSpinner.fail()
-      throw new Error(e)
-    })
+    if (installedVersion) {
+      compareVersionsSpinner.start()
+      upToDate = await checkIfUpToDate(currentAvailableVersion, installedVersion).catch(e => {
+        compareVersionsSpinner.fail()
+        throw new Error(e)
+      })
 
-    if (upToDate) {
-      compareVersionsSpinner.succeed(chalk.greenBright(`v${installedVersion}`) + ' = ' + chalk.greenBright(`v${currentAvailableVersion}`))
-    } else {
-      compareVersionsSpinner.warn(chalk.redBright(`v${installedVersion}`) + ' < ' + chalk.greenBright(`v${currentAvailableVersion}`))
+      if (upToDate) {
+        compareVersionsSpinner.succeed(chalk.greenBright(`v${installedVersion}`) + ' = ' + chalk.greenBright(`v${currentAvailableVersion}`))
+      } else {
+        compareVersionsSpinner.warn(chalk.redBright(`v${installedVersion}`) + ' < ' + chalk.greenBright(`v${currentAvailableVersion}`))
+      }
     }
-  }
 
-  state.isUpToDate = upToDate
-  return upToDate
+    state.isUpToDate = upToDate
+    return upToDate
+  } catch (e) {
+    throw new Error(e)
+  }
 }
 
 /**
@@ -102,22 +120,26 @@ const isUpToDate = async state => {
  * @async
  */
 const readCache = async state => {
-  readCacheSpinner.start()
-  const cacheLocation = isMac ? path.join(process.env.HOME, '/Library/Caches/Cypress') : path.join(process.env.TEMP, '../Cypress/Cache')
-  const cachedVersions = await getCachedVersions(cacheLocation).catch(e => {
-    readCacheSpinner.fail()
+  try {
+    readCacheSpinner.start()
+    const cacheLocation = isMac ? path.join(process.env.HOME, '/Library/Caches/Cypress') : path.join(process.env.TEMP, '../Cypress/Cache')
+    const cachedVersions = await getCachedVersions(cacheLocation).catch(e => {
+      readCacheSpinner.fail()
+      throw new Error(e)
+    })
+
+    if (cachedVersions.length > 0) {
+      readCacheSpinner.succeed(`Cypress cache contains ${chalk.yellowBright(cachedVersions)}`)
+    } else {
+      readCacheSpinner.succeed(`Cypress cache is empty`)
+    }
+
+    state.cacheLocation = cacheLocation
+    state.cachedVersions = cachedVersions
+    return { cachedVersions, cacheLocation }
+  } catch (e) {
     throw new Error(e)
-  })
-
-  if (cachedVersions.length > 0) {
-    readCacheSpinner.succeed(`Cypress cache contains ${chalk.yellowBright(cachedVersions)}`)
-  } else {
-    readCacheSpinner.succeed(`Cypress cache is empty`)
   }
-
-  state.cacheLocation = cacheLocation
-  state.cachedVersions = cachedVersions
-  return { cachedVersions, cacheLocation }
 }
 
 /**
@@ -126,14 +148,18 @@ const readCache = async state => {
  * @async
  */
 const cleanCache = async state => {
-  const { cacheLocation, cachedVersions } = state
-  clearCacheSpinner.start()
-  await clearCache(cacheLocation, cachedVersions).catch(e => {
-    clearCacheSpinner.fail()
+  try {
+    const { cacheLocation, cachedVersions } = state
+    clearCacheSpinner.start()
+    await clearCache(cacheLocation, cachedVersions).catch(e => {
+      clearCacheSpinner.fail()
+      throw new Error(e)
+    })
+    state.cachedVersions = []
+    clearCacheSpinner.succeed('Cache cleared')
+  } catch (e) {
     throw new Error(e)
-  })
-  state.cachedVersions = []
-  clearCacheSpinner.succeed('Cache cleared')
+  }
 }
 
 /**
@@ -142,14 +168,18 @@ const cleanCache = async state => {
  * @async
  */
 const downloadCypress = async state => {
-  const downloadUrl = state.latestCypressDetails.packages[process.platform].url
-  const version = state.latestCypressDetails.version
+  try {
+    const downloadUrl = state.latestCypressDetails.packages[process.platform].url
+    const version = state.latestCypressDetails.version
 
-  await download(downloadUrl).catch(e => {
-    downloadSpinner.fail()
+    await download(downloadUrl).catch(e => {
+      downloadSpinner.fail()
+      throw new Error(e)
+    })
+    downloadSpinner.succeed(`Downloaded Cypress ${chalk.yellowBright('v' + version)}`)
+  } catch (e) {
     throw new Error(e)
-  })
-  downloadSpinner.succeed(`Downloaded Cypress ${chalk.yellowBright('v' + version)}`)
+  }
 }
 
 /**
@@ -158,18 +188,22 @@ const downloadCypress = async state => {
  * @async
  */
 const installCypress = async state => {
-  const version = state.latestCypressDetails.version
-  const installSpinner = installCypressSpinner(version)
-  installSpinner.start()
-  await addCypress(version).catch(e => {
-    installSpinner.fail()
+  try {
+    const version = state.latestCypressDetails.version
+    const installSpinner = installCypressSpinner(version)
+    installSpinner.start()
+    await addCypress(version).catch(e => {
+      installSpinner.fail()
+      throw new Error(e)
+    })
+    state.installedVersion = version
+    // TODO - Probably need to make this more dynamic to handle installing out of date versions.
+    state.isUpToDate = true
+    state.cachedVersions.push(version)
+    installSpinner.succeed(`Installed Cypress ${chalk.yellowBright('v' + version)}`)
+  } catch (e) {
     throw new Error(e)
-  })
-  state.installedVersion = version
-  // TODO - Probably need to make this more dynamic to handle installing out of date versions.
-  state.isUpToDate = true
-  state.cachedVersions.push(version)
-  installSpinner.succeed(`Installed Cypress ${chalk.yellowBright('v' + version)}`)
+  }
 }
 
 /**
@@ -178,17 +212,21 @@ const installCypress = async state => {
  * @async
  */
 const updateCypress = async state => {
-  const oldVersion = state.installedVersion
-  const newVersion = state.latestCypressDetails.version
-  const updateSpinner = updateCypressSpinner(oldVersion, newVersion)
-  updateSpinner.start()
-  await addCypress(newVersion).catch(e => {
-    updateSpinner.fail()
+  try {
+    const oldVersion = state.installedVersion
+    const newVersion = state.latestCypressDetails.version
+    const updateSpinner = updateCypressSpinner(oldVersion, newVersion)
+    updateSpinner.start()
+    await addCypress(newVersion).catch(e => {
+      updateSpinner.fail()
+      throw new Error(e)
+    })
+    state.installedVersion = newVersion
+    state.isUpToDate = true
+    updateSpinner.succeed(`Updated Cypress from ${chalk.yellowBright('v' + oldVersion)} to ${chalk.yellowBright('v' + newVersion)}`)
+  } catch (e) {
     throw new Error(e)
-  })
-  state.installedVersion = newVersion
-  state.isUpToDate = true
-  updateSpinner.succeed(`Updated Cypress from ${chalk.yellowBright('v' + oldVersion)} to ${chalk.yellowBright('v' + newVersion)}`)
+  }
 }
 
 /**
@@ -197,13 +235,17 @@ const updateCypress = async state => {
  * @async
  */
 const uninstallCypress = async state => {
-  uninstallSpinner.start()
-  await removeCypress().catch(e => {
-    uninstallSpinner.fail()
+  try {
+    uninstallSpinner.start()
+    await removeCypress().catch(e => {
+      uninstallSpinner.fail()
+      throw new Error(e)
+    })
+    state.installedVersion = false
+    uninstallSpinner.succeed(`Uninstalled Cypress`)
+  } catch (e) {
     throw new Error(e)
-  })
-  state.installedVersion = false
-  uninstallSpinner.succeed(`Uninstalled Cypress`)
+  }
 }
 
 /**
@@ -211,35 +253,39 @@ const uninstallCypress = async state => {
  * @param {Object} state Application state.
  */
 const interpretMenuAction = async state => {
-  const { menuAction } = state
+  try {
+    const { menuAction } = state
 
-  const actions = {
-    about: async () => {
-      await displayAboutMenu()
-      state.menuActionEmitter.emit('actionCompleted', state)
-    },
-    clearCache: async () => {
-      await readCache(state)
-      await cleanCache(state)
-      state.menuActionEmitter.emit('actionCompleted', state)
-    },
-    exit: () => process.exit(0),
-    install: async () => {
-      await downloadCypress(state)
-      await installCypress(state)
-      state.menuActionEmitter.emit('actionCompleted', state)
-    },
-    uninstall: async () => {
-      await uninstallCypress(state)
-      state.menuActionEmitter.emit('actionCompleted', state)
-    },
-    update: async () => {
-      await updateCypress(state)
-      state.menuActionEmitter.emit('actionCompleted', state)
+    const actions = {
+      about: async () => {
+        await displayAboutMenu()
+        state.menuActionEmitter.emit('actionCompleted', state)
+      },
+      clearCache: async () => {
+        await readCache(state)
+        await cleanCache(state)
+        state.menuActionEmitter.emit('actionCompleted', state)
+      },
+      exit: () => process.exit(0),
+      install: async () => {
+        await downloadCypress(state)
+        await installCypress(state)
+        state.menuActionEmitter.emit('actionCompleted', state)
+      },
+      uninstall: async () => {
+        await uninstallCypress(state)
+        state.menuActionEmitter.emit('actionCompleted', state)
+      },
+      update: async () => {
+        await updateCypress(state)
+        state.menuActionEmitter.emit('actionCompleted', state)
+      }
     }
-  }
 
-  await actions[menuAction]()
+    await actions[menuAction]()
+  } catch (e) {
+    throw new Error(e)
+  }
 }
 
 module.exports = {
