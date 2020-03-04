@@ -106,3 +106,5 @@ dist
 Cypress.zip
 
 lib/
+
+cypress-tool
