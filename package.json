@@ -1,15 +1,15 @@
 {
   "name": "cypress-tool",
   "version": "0.0.0",
-  "description": "Tool to help update/fix Cypress installs over US Bank Proxy",
+  "description": "Tool to help update/fix Cypress installs.",
   "main": "lib/index.js",
   "bin": "bin.js",
   "scripts": {
     "build": "babel src -d lib",
     "start": "node bin.js",
-    "clean": "rimraf lib && npm install -g cypress && npx cypress cache clear && npm uninstall -g cypress",
+    "clean": "rimraf lib",
     "format": "prettier --write \"**/*.{js,json}\"",
-    "compile": "pkg . --targets node10-macos-x64"
+    "compile": "pkg . --targets node10-macos-x64,node10-win-x64"
   },
   "keywords": [],
   "author": "Alex Lee <www.alexlee.dev>",
