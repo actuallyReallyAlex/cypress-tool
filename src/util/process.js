@@ -1,4 +1,4 @@
-import { exec, spawn } from "child_process";
+import { exec, spawn } from 'child_process'
 
 /**
  * Executes a command in a side process.
@@ -10,14 +10,14 @@ const execute = command =>
     try {
       exec(command, (error, stdout, stderr) => {
         if (error) {
-          return reject(error);
+          return reject(error)
         }
-        return resolve(stdout);
-      });
+        return resolve(stdout)
+      })
     } catch (e) {
-      return reject(e);
+      return reject(e)
     }
-  });
+  })
 
 /**
  * Spawns a new process and writes output
@@ -33,18 +33,18 @@ const spawnProcess = (command, arg, writeOutput = true, additionalEnv = {}) =>
       const proc = spawn(command, arg, {
         shell: true,
         env: { ...process.env, ...additionalEnv }
-      });
+      })
 
       if (writeOutput) {
-        proc.stdout.on("data", data => process.stdout.write(data));
-        proc.stderr.on("data", data => process.stderr.write(data));
+        proc.stdout.on('data', data => process.stdout.write(data))
+        proc.stderr.on('data', data => process.stderr.write(data))
       }
 
-      proc.on("close", code => resolve());
-      proc.on("error", error => reject(error));
+      proc.on('close', code => resolve())
+      proc.on('error', error => reject(error))
     } catch (e) {
-      return reject(e);
+      return reject(e)
     }
-  });
+  })
 
-module.exports = { execute, spawnProcess };
+module.exports = { execute, spawnProcess }

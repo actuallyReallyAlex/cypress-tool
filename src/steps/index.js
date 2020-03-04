@@ -1,15 +1,10 @@
-import chalk from "chalk";
-import path from "path";
+import chalk from 'chalk'
+import path from 'path'
 
-import { isMac } from "../constants";
-import {
-  addCypress,
-  checkIfUpToDate,
-  getCurrentCypressVersion,
-  getLatestCypressDetails
-} from "../util/cypress";
-import { clearCache, getCachedVersions } from "../util/fileSystem";
-import { download } from "../util/request";
+import { isMac } from '../constants'
+import { addCypress, checkIfUpToDate, getCurrentCypressVersion, getLatestCypressDetails } from '../util/cypress'
+import { clearCache, getCachedVersions } from '../util/fileSystem'
+import { download } from '../util/request'
 import {
   checkCypressInstallationSpinner,
   clearCacheSpinner,
@@ -19,14 +14,14 @@ import {
   installCypressSpinner,
   readCacheSpinner,
   updateCypressSpinner
-} from "../util/spinners";
-import { generateTitle } from "../util/title";
+} from '../util/spinners'
+import { generateTitle } from '../util/title'
 
 /**
  * Generates a pretty title.
  * @async
  */
-const title = async () => await generateTitle("Cypress Tool");
+const title = async () => await generateTitle('Cypress Tool')
 
 /**
  * Gets latest Cypress details.
@@ -34,18 +29,14 @@ const title = async () => await generateTitle("Cypress Tool");
  * @async
  */
 const getLatestDetails = async () => {
-  getLatestCypressDetailsSpinner.start();
+  getLatestCypressDetailsSpinner.start()
   const latestCypressDetails = await getLatestCypressDetails().catch(e => {
-    getLatestCypressDetailsSpinner.fail();
-    throw new Error(e);
-  });
-  getLatestCypressDetailsSpinner.succeed(
-    `Latest Cypress release is ${chalk.yellowBright(
-      "v" + latestCypressDetails.version
-    )}`
-  );
-  return latestCypressDetails;
-};
+    getLatestCypressDetailsSpinner.fail()
+    throw new Error(e)
+  })
+  getLatestCypressDetailsSpinner.succeed(`Latest Cypress release is ${chalk.yellowBright('v' + latestCypressDetails.version)}`)
+  return latestCypressDetails
+}
 
 /**
  * Gets current Cypress version installed on machine.
@@ -53,24 +44,20 @@ const getLatestDetails = async () => {
  * @async
  */
 const getCurrentVersion = async () => {
-  checkCypressInstallationSpinner.start();
+  checkCypressInstallationSpinner.start()
   const currentCypressVersion = await getCurrentCypressVersion().catch(e => {
-    checkCypressInstallationSpinner.fail();
-    throw new Error(e);
-  });
+    checkCypressInstallationSpinner.fail()
+    throw new Error(e)
+  })
 
   if (currentCypressVersion) {
-    checkCypressInstallationSpinner.succeed(
-      `Installed version is ${chalk.yellowBright(currentCypressVersion)}`
-    );
+    checkCypressInstallationSpinner.succeed(`Installed version is ${chalk.yellowBright(currentCypressVersion)}`)
   } else {
-    checkCypressInstallationSpinner.warn(
-      "No installed Cypress version detected"
-    );
+    checkCypressInstallationSpinner.warn('No installed Cypress version detected')
   }
 
-  return currentCypressVersion;
-};
+  return currentCypressVersion
+}
 
 /**
  * Checks if the version of Cypress on the machine is up to date.
@@ -80,35 +67,24 @@ const getCurrentVersion = async () => {
  * @async
  */
 const isUpToDate = async (currentInstalledVersion, currentAvailableVersion) => {
-  let upToDate = false;
+  let upToDate = false
 
   if (currentInstalledVersion) {
-    compareVersionsSpinner.start();
-    upToDate = await checkIfUpToDate(
-      currentAvailableVersion,
-      currentInstalledVersion
-    ).catch(e => {
-      compareVersionsSpinner.fail();
-      throw new Error(e);
-    });
+    compareVersionsSpinner.start()
+    upToDate = await checkIfUpToDate(currentAvailableVersion, currentInstalledVersion).catch(e => {
+      compareVersionsSpinner.fail()
+      throw new Error(e)
+    })
 
     if (upToDate) {
-      compareVersionsSpinner.succeed(
-        chalk.greenBright(`v${currentInstalledVersion}`) +
-          " = " +
-          chalk.greenBright(`v${currentAvailableVersion}`)
-      );
+      compareVersionsSpinner.succeed(chalk.greenBright(`v${currentInstalledVersion}`) + ' = ' + chalk.greenBright(`v${currentAvailableVersion}`))
     } else {
-      compareVersionsSpinner.warn(
-        chalk.redBright(`v${currentInstalledVersion}`) +
-          " < " +
-          chalk.greenBright(`v${currentAvailableVersion}`)
-      );
+      compareVersionsSpinner.warn(chalk.redBright(`v${currentInstalledVersion}`) + ' < ' + chalk.greenBright(`v${currentAvailableVersion}`))
     }
   }
 
-  return upToDate;
-};
+  return upToDate
+}
 
 /**
  * Reads the Cypress cache.
@@ -116,25 +92,21 @@ const isUpToDate = async (currentInstalledVersion, currentAvailableVersion) => {
  * @async
  */
 const readCache = async () => {
-  readCacheSpinner.start();
-  const cacheLocation = isMac
-    ? path.join(process.env.HOME, "/Library/Caches/Cypress")
-    : path.join(process.env.TEMP, "../Cypress/Cache");
+  readCacheSpinner.start()
+  const cacheLocation = isMac ? path.join(process.env.HOME, '/Library/Caches/Cypress') : path.join(process.env.TEMP, '../Cypress/Cache')
   const cachedVersions = await getCachedVersions(cacheLocation).catch(e => {
-    readCacheSpinner.fail();
-    throw new Error(e);
-  });
+    readCacheSpinner.fail()
+    throw new Error(e)
+  })
 
   if (cachedVersions.length > 0) {
-    readCacheSpinner.succeed(
-      `Cypress cache contains ${chalk.yellowBright(cachedVersions)}`
-    );
+    readCacheSpinner.succeed(`Cypress cache contains ${chalk.yellowBright(cachedVersions)}`)
   } else {
-    readCacheSpinner.succeed(`Cypress cache is empty`);
+    readCacheSpinner.succeed(`Cypress cache is empty`)
   }
 
-  return { cachedVersions, cacheLocation };
-};
+  return { cachedVersions, cacheLocation }
+}
 
 /**
  * Cleans out Cypress cache of previous installs.
@@ -143,13 +115,13 @@ const readCache = async () => {
  * @async
  */
 const cleanCache = async (cachedVersions, cacheLocation) => {
-  clearCacheSpinner.start();
+  clearCacheSpinner.start()
   await clearCache(cacheLocation, cachedVersions).catch(e => {
-    clearCacheSpinner.fail();
-    throw new Error(e);
-  });
-  clearCacheSpinner.succeed("Cache cleared");
-};
+    clearCacheSpinner.fail()
+    throw new Error(e)
+  })
+  clearCacheSpinner.succeed('Cache cleared')
+}
 
 /**
  * Downloads and saves Cypress.zip
@@ -159,13 +131,11 @@ const cleanCache = async (cachedVersions, cacheLocation) => {
  */
 const downloadCypress = async (downloadUrl, version) => {
   await download(downloadUrl).catch(e => {
-    downloadSpinner.fail();
-    throw new Error(e);
-  });
-  downloadSpinner.succeed(
-    `Downloaded Cypress ${chalk.yellowBright("v" + version)}`
-  );
-};
+    downloadSpinner.fail()
+    throw new Error(e)
+  })
+  downloadSpinner.succeed(`Downloaded Cypress ${chalk.yellowBright('v' + version)}`)
+}
 
 /**
  * Installs Cypress from the downloaded Cypress.zip
@@ -173,16 +143,14 @@ const downloadCypress = async (downloadUrl, version) => {
  * @async
  */
 const installCypress = async version => {
-  const installSpinner = installCypressSpinner(version);
-  installSpinner.start();
+  const installSpinner = installCypressSpinner(version)
+  installSpinner.start()
   await addCypress(version).catch(e => {
-    installSpinner.fail();
-    throw new Error(e);
-  });
-  installSpinner.succeed(
-    `Installed Cypress ${chalk.yellowBright("v" + version)}`
-  );
-};
+    installSpinner.fail()
+    throw new Error(e)
+  })
+  installSpinner.succeed(`Installed Cypress ${chalk.yellowBright('v' + version)}`)
+}
 
 /**
  * Updates Cypress to the latest version available.
@@ -191,18 +159,14 @@ const installCypress = async version => {
  * @async
  */
 const updateCypress = async (oldVersion, newVersion) => {
-  const updateSpinner = updateCypressSpinner(oldVersion, newVersion);
-  updateSpinner.start();
+  const updateSpinner = updateCypressSpinner(oldVersion, newVersion)
+  updateSpinner.start()
   await addCypress(newVersion).catch(e => {
-    updateSpinner.fail();
-    throw new Error(e);
-  });
-  updateSpinner.succeed(
-    `Updated Cypress from ${chalk.yellowBright(
-      "v" + oldVersion
-    )} to ${chalk.yellowBright("v" + newVersion)}`
-  );
-};
+    updateSpinner.fail()
+    throw new Error(e)
+  })
+  updateSpinner.succeed(`Updated Cypress from ${chalk.yellowBright('v' + oldVersion)} to ${chalk.yellowBright('v' + newVersion)}`)
+}
 
 module.exports = {
   title,
@@ -214,4 +178,4 @@ module.exports = {
   downloadCypress,
   installCypress,
   updateCypress
-};
+}
