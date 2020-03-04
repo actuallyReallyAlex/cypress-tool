@@ -82,14 +82,22 @@ const displayMainMenu = state =>
  * @async
  */
 const keypress = async () => {
-  process.stdin.setRawMode(true)
-  return new Promise(resolve => {
-    process.stdin.resume()
-    process.stdin.once('data', data => {
-      process.stdin.setRawMode(false)
-      resolve()
+  try {
+    process.stdin.setRawMode(true)
+    return new Promise(resolve => {
+      try {
+        process.stdin.resume()
+        process.stdin.once('data', data => {
+          process.stdin.setRawMode(false)
+          resolve()
+        })
+      } catch (e) {
+        return reject(e)
+      }
     })
-  })
+  } catch (e) {
+    throw new Error(e)
+  }
 }
 
 /**
