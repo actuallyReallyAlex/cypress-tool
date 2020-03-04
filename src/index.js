@@ -9,6 +9,7 @@ import { title, getLatestDetails, getCurrentVersion, isUpToDate, readCache, clea
 
 // TODO - Allow to download/install older Cypress versions as well
 // TODO - Abiility to uninstall Cypress
+// TODO - Show Options screen if decide not to install / update
 
 const main = async () => {
   try {
