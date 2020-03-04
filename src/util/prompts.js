@@ -3,7 +3,7 @@ import inquirer from "inquirer";
 /**
  * Prompts user to install Cypress.
  * @param {String} latestVersion Latest version of Cypress.
- * @returns {Promise} Resolves with a boolean of the users' choice.
+ * @returns {Promise} Resolves with a boolean of the user's choice.
  */
 const promptToInstallCypress = latestVersion =>
   new Promise(async (resolve, reject) => {
@@ -22,4 +22,27 @@ const promptToInstallCypress = latestVersion =>
     }
   });
 
-module.exports = { promptToInstallCypress };
+/**
+ * Prompts user to update Cypress.
+ * @param {String} oldVersion Old version.
+ * @param {String} newVersion New version.
+ * @returns {Promise} Resolves with a boolean of the user's choice.
+ */
+const promptToUpdateCypress = (oldVersion, newVersion) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const { shouldUpdate } = await inquirer.prompt([
+        {
+          type: "confirm",
+          message: `Would you like to update your Cypress installation from v${oldVersion} to v${newVersion}?`,
+          name: "shouldUpdate"
+        }
+      ]);
+
+      return resolve(shouldUpdate);
+    } catch (e) {
+      return reject(e);
+    }
+  });
+
+module.exports = { promptToInstallCypress, promptToUpdateCypress };

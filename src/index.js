@@ -4,7 +4,7 @@ import chalk from "chalk";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-import { promptToInstallCypress } from "./util/prompts";
+import { promptToInstallCypress, promptToUpdateCypress } from "./util/prompts";
 import {
   title,
   getLatestDetails,
@@ -13,10 +13,12 @@ import {
   readCache,
   cleanCache,
   downloadCypress,
-  installCypress
+  installCypress,
+  updateCypress
 } from "./steps";
 
 // TODO - Allow to download/install older Cypress versions as well
+// TODO - Chalk-ify some important things to the terminal, like version numbers etc.
 
 const main = async () => {
   try {
@@ -74,14 +76,23 @@ const main = async () => {
       }
     }
 
-    // * Prompt to update (only if installed and out of date)
+    if (currentCypressVersion && !upToDate) {
+      // * Prompt to update (only if installed and out of date)
+      const shouldUpdate = await promptToUpdateCypress(
+        currentCypressVersion,
+        latestCypressDetails.version
+      );
 
-    //   await promptUpdateCypress(latestVersion, win32DownloadUrl).catch(e => {
-    //     throw new Error(e);
-    //   });
-    // }
+      if (shouldUpdate) {
+        // * Update Cypress to the latest version available
+        await updateCypress(
+          currentCypressVersion,
+          latestCypressDetails.version
+        );
+      }
+    }
   } catch (e) {
-    console.error(e);
+    console.log(chalk.red(e));
   }
 };
 
