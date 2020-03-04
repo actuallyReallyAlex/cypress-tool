@@ -1,6 +1,7 @@
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import chalk from 'chalk'
+import EventEmitter from 'events'
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
@@ -33,6 +34,15 @@ import {
 
 const main = async () => {
   try {
+    class MenuActionEmitter extends EventEmitter {}
+
+    const menuActionEmitter = new MenuActionEmitter()
+    menuActionEmitter.on('actionCompleted', async state => {
+      await displayMainMenu(state)
+
+      interpretMenuAction(state)
+    })
+
     const state = {
       cacheLocation: null,
       cachedVersions: [],
@@ -40,6 +50,7 @@ const main = async () => {
       isUpToDate: null,
       latestCypressDetails: null,
       menuAction: null,
+      menuActionEmitter,
       shouldInstall: null,
       shouldUpdate: null
     }

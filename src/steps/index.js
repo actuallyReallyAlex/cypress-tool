@@ -4,7 +4,6 @@ import path from 'path'
 import { isMac } from '../constants'
 import { addCypress, checkIfUpToDate, getCurrentCypressVersion, getLatestCypressDetails, removeCypress } from '../util/cypress'
 import { clearCache, getCachedVersions } from '../util/fileSystem'
-import { displayMainMenu } from '../util/prompts'
 import { download } from '../util/request'
 import {
   checkCypressInstallationSpinner,
@@ -217,29 +216,21 @@ const interpretMenuAction = async state => {
     clearCache: async () => {
       await readCache(state)
       await cleanCache(state)
-      await displayMainMenu(state)
-      console.log(chalk.redBright('Need to create an event emitter to handle repeat visits to main menu'))
-      // TODO - Need a way to call interpretMenuAction now too...
+      state.menuActionEmitter.emit('actionCompleted', state)
     },
     exit: () => process.exit(0),
     install: async () => {
       await downloadCypress(state)
       await installCypress(state)
-      await displayMainMenu(state)
-      console.log(chalk.redBright('Need to create an event emitter to handle repeat visits to main menu'))
-      // TODO - Need a way to call interpretMenuAction now too...
+      state.menuActionEmitter.emit('actionCompleted', state)
     },
     uninstall: async () => {
       await uninstallCypress(state)
-      await displayMainMenu(state)
-      console.log(chalk.redBright('Need to create an event emitter to handle repeat visits to main menu'))
-      // TODO - Need a way to call interpretMenuAction now too...
+      state.menuActionEmitter.emit('actionCompleted', state)
     },
     update: async () => {
       await updateCypress(state)
-      await displayMainMenu(state)
-      console.log(chalk.redBright('Need to create an event emitter to handle repeat visits to main menu'))
-      // TODO - Need a way to call interpretMenuAction now too...
+      state.menuActionEmitter.emit('actionCompleted', state)
     }
   }
 
