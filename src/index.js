@@ -4,12 +4,14 @@ import chalk from 'chalk'
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
-import { promptToInstallCypress, promptToUpdateCypress } from './util/prompts'
+import { displayMainMenu, promptToInstallCypress, promptToUpdateCypress } from './util/prompts'
 import { title, getLatestDetails, getCurrentVersion, isUpToDate, readCache, cleanCache, downloadCypress, installCypress, updateCypress } from './steps'
 
 // TODO - Allow to download/install older Cypress versions as well
 // TODO - Abiility to uninstall Cypress
 // TODO - Show Options screen if decide not to install / update
+// TODO - Add Sentry error tracking
+// TODO - Option to install locally as dev dependency
 
 const main = async () => {
   try {
@@ -66,6 +68,9 @@ const main = async () => {
         await updateCypress(currentCypressVersion, latestCypressDetails.version)
       }
     }
+
+    const menuOption = await displayMainMenu(currentCypressVersion, upToDate, latestCypressDetails)
+    console.log({ menuOption })
   } catch (e) {
     console.log(chalk.red(e))
   }
