@@ -1,3 +1,6 @@
+import chalk from "chalk";
+import path from "path";
+
 import { isMac } from "../constants";
 import {
   addCypress,
@@ -19,8 +22,6 @@ import {
 } from "../util/spinners";
 import { generateTitle } from "../util/title";
 
-import path from "path";
-
 /**
  * Generates a pretty title.
  * @async
@@ -39,7 +40,9 @@ const getLatestDetails = async () => {
     throw new Error(e);
   });
   getLatestCypressDetailsSpinner.succeed(
-    `Latest Cypress release is v${latestCypressDetails.version}`
+    `Latest Cypress release is ${chalk.yellowBright(
+      "v" + latestCypressDetails.version
+    )}`
   );
   return latestCypressDetails;
 };
@@ -58,7 +61,7 @@ const getCurrentVersion = async () => {
 
   if (currentCypressVersion) {
     checkCypressInstallationSpinner.succeed(
-      `Installed version is v${currentCypressVersion}`
+      `Installed version is ${chalk.yellowBright(currentCypressVersion)}`
     );
   } else {
     checkCypressInstallationSpinner.warn(
@@ -91,11 +94,15 @@ const isUpToDate = async (currentInstalledVersion, currentAvailableVersion) => {
 
     if (upToDate) {
       compareVersionsSpinner.succeed(
-        `v${currentInstalledVersion} = v${currentAvailableVersion}`
+        chalk.greenBright(`v${currentInstalledVersion}`) +
+          " = " +
+          chalk.greenBright(`v${currentAvailableVersion}`)
       );
     } else {
       compareVersionsSpinner.warn(
-        `v${currentInstalledVersion} < v${currentAvailableVersion}`
+        chalk.redBright(`v${currentInstalledVersion}`) +
+          " < " +
+          chalk.greenBright(`v${currentAvailableVersion}`)
       );
     }
   }
@@ -119,7 +126,9 @@ const readCache = async () => {
   });
 
   if (cachedVersions.length > 0) {
-    readCacheSpinner.succeed(`Cypress cache contains ${cachedVersions}`);
+    readCacheSpinner.succeed(
+      `Cypress cache contains ${chalk.yellowBright(cachedVersions)}`
+    );
   } else {
     readCacheSpinner.succeed(`Cypress cache is empty`);
   }
@@ -153,7 +162,9 @@ const downloadCypress = async (downloadUrl, version) => {
     downloadSpinner.fail();
     throw new Error(e);
   });
-  downloadSpinner.succeed(`Downloaded Cypress v${version}`);
+  downloadSpinner.succeed(
+    `Downloaded Cypress ${chalk.yellowBright("v" + version)}`
+  );
 };
 
 /**
@@ -168,7 +179,9 @@ const installCypress = async version => {
     installSpinner.fail();
     throw new Error(e);
   });
-  installSpinner.succeed(`Installed Cypress v${version}`);
+  installSpinner.succeed(
+    `Installed Cypress ${chalk.yellowBright("v" + version)}`
+  );
 };
 
 /**
@@ -185,7 +198,9 @@ const updateCypress = async (oldVersion, newVersion) => {
     throw new Error(e);
   });
   updateSpinner.succeed(
-    `Updated Cypress from v${oldVersion} to v${newVersion}`
+    `Updated Cypress from ${chalk.yellowBright(
+      "v" + oldVersion
+    )} to ${chalk.yellowBright("v" + newVersion)}`
   );
 };
 
