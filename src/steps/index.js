@@ -14,7 +14,8 @@ import {
   downloadSpinner,
   getLatestCypressDetailsSpinner,
   installCypressSpinner,
-  readCacheSpinner
+  readCacheSpinner,
+  updateCypressSpinner
 } from "../util/spinners";
 import { generateTitle } from "../util/title";
 
@@ -170,6 +171,24 @@ const installCypress = async version => {
   installSpinner.succeed(`Installed Cypress v${version}`);
 };
 
+/**
+ * Updates Cypress to the latest version available.
+ * @param {String} oldVersion Old version.
+ * @param {String} newVersion New version.
+ * @async
+ */
+const updateCypress = async (oldVersion, newVersion) => {
+  const updateSpinner = updateCypressSpinner(oldVersion, newVersion);
+  updateSpinner.start();
+  await addCypress(newVersion).catch(e => {
+    updateSpinner.fail();
+    throw new Error(e);
+  });
+  updateSpinner.succeed(
+    `Updated Cypress from v${oldVersion} to v${newVersion}`
+  );
+};
+
 module.exports = {
   title,
   getLatestDetails,
@@ -178,5 +197,6 @@ module.exports = {
   readCache,
   cleanCache,
   downloadCypress,
-  installCypress
+  installCypress,
+  updateCypress
 };
