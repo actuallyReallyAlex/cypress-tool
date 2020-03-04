@@ -28,7 +28,7 @@ import {
 // TODO - On Main Menu -> Yellow if InstalledVersion could be updated. Green if isUpToDate
 // TODO - Exit menu option
 // TODO - Need an event emitter to hanlde repeat visits to Main Menu
-// ! TODO - Cypress Not Installed -> Start -> Install Cypress latest -> tool prompts user to update even though latest version was just installed
+// TODO - Use pkg to compile into an executable
 
 const main = async () => {
   try {

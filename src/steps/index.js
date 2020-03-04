@@ -152,7 +152,7 @@ const downloadCypress = async state => {
 }
 
 /**
- * Installs Cypress from the downloaded Cypress.zip
+ * Installs Cypress from the downloaded Cypress.zip. Installs latest version!
  * @param {Object} state Application State.
  * @async
  */
@@ -165,6 +165,8 @@ const installCypress = async state => {
     throw new Error(e)
   })
   state.installedVersion = version
+  // TODO - Probably need to make this more dynamic to handle installing out of date versions.
+  state.isUpToDate = true
   installSpinner.succeed(`Installed Cypress ${chalk.yellowBright('v' + version)}`)
 }
 
