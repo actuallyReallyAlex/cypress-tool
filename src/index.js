@@ -10,7 +10,6 @@ import { title, getLatestDetails, getCurrentVersion, isUpToDate, readCache, clea
 // TODO - Allow to download/install older Cypress versions as well
 // TODO - Chalk-ify some important things to the terminal, like version numbers etc.
 // TODO - Abiility to uninstall Cypress
-// TODO - Prettier
 
 const main = async () => {
   try {
