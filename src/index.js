@@ -18,7 +18,6 @@ import {
   interpretMenuAction
 } from './steps'
 
-// TODO - Install Action
 // TODO - Update Action
 // TODO - ClearCache Action
 // TODO - Need an event emitter to hanlde repeat visits to Main Menu

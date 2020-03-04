@@ -214,8 +214,12 @@ const interpretMenuAction = async state => {
       console.log(chalk.redBright('TODO - ClearCache Action'))
     },
     exit: () => process.exit(0),
-    install: () => {
-      console.log(chalk.redBright('TODO - Install Action'))
+    install: async () => {
+      await downloadCypress(state)
+      await installCypress(state)
+      await displayMainMenu(state)
+      console.log(chalk.redBright('Need to create an event emitter to handle repeat visits to main menu'))
+      // TODO - Need a way to call interpretMenuAction now too...
     },
     uninstall: async () => {
       await uninstallCypress(state)
