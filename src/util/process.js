@@ -7,16 +7,12 @@ import { exec, spawn } from 'child_process'
  */
 const execute = command =>
   new Promise((resolve, reject) => {
-    try {
-      exec(command, (error, stdout, stderr) => {
-        if (error) {
-          return reject(error)
-        }
-        return resolve(stdout)
-      })
-    } catch (e) {
-      return reject(e)
-    }
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        return reject(error)
+      }
+      return resolve(stdout)
+    })
   })
 
 /**
@@ -29,22 +25,18 @@ const execute = command =>
  */
 const spawnProcess = (command, arg, writeOutput = true, additionalEnv = {}) =>
   new Promise(async (resolve, reject) => {
-    try {
-      const proc = spawn(command, arg, {
-        shell: true,
-        env: { ...process.env, ...additionalEnv }
-      })
+    const proc = spawn(command, arg, {
+      shell: true,
+      env: { ...process.env, ...additionalEnv }
+    })
 
-      if (writeOutput) {
-        proc.stdout.on('data', data => process.stdout.write(data))
-        proc.stderr.on('data', data => process.stderr.write(data))
-      }
-
-      proc.on('close', code => resolve())
-      proc.on('error', error => reject(error))
-    } catch (e) {
-      return reject(e)
+    if (writeOutput) {
+      proc.stdout.on('data', data => process.stdout.write(data))
+      proc.stderr.on('data', data => process.stderr.write(data))
     }
+
+    proc.on('close', code => resolve())
+    proc.on('error', error => reject(error))
   })
 
 module.exports = { execute, spawnProcess }

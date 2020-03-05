@@ -37,14 +37,7 @@ const addCypress = version =>
  * @param {String} installedVersion Currently installed version of Cypress
  * @returns {Promise} Promise returns Boolean - true if up to date and false if not
  */
-const checkIfUpToDate = (latestVersion, installedVersion) =>
-  new Promise((resolve, reject) => {
-    try {
-      return resolve(semver.satisfies(installedVersion, `=${latestVersion}`))
-    } catch (e) {
-      return reject(e)
-    }
-  })
+const checkIfUpToDate = (latestVersion, installedVersion) => new Promise((resolve, reject) => resolve(semver.satisfies(installedVersion, `=${latestVersion}`)))
 
 /**
  * Gets version number of installed Cypress version, or returns false.

@@ -37,19 +37,15 @@ const defaultBoxenStyle = {
  * @returns {Promise} Resolves with text.
  */
 const figletPromise = (txt, options = {}) =>
-  new Promise((resolve, reject) => {
-    try {
-      figlet.text(txt, options, (error, result) => {
-        if (error) {
-          return reject(error)
-        }
+  new Promise((resolve, reject) =>
+    figlet.text(txt, options, (error, result) => {
+      if (error) {
+        return reject(error)
+      }
 
-        return resolve(result)
-      })
-    } catch (e) {
-      return reject(e)
-    }
-  })
+      return resolve(result)
+    })
+  )
 
 /**
  * Generates the About Page.
