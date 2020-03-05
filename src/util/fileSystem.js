@@ -28,18 +28,14 @@ const asyncForEach = (array, callback) =>
  * @returns {Promise} Resolves to the file stats if it exists, or false otherwise.
  */
 const checkIfFileExists = path =>
-  new Promise((resolve, reject) => {
-    try {
-      fs.stat(path, (err, stats) => {
-        if (err) {
-          return resolve(false)
-        }
-        return resolve(stats)
-      })
-    } catch (e) {
-      return reject(e)
-    }
-  })
+  new Promise((resolve, reject) =>
+    fs.stat(path, (err, stats) => {
+      if (err) {
+        return resolve(false)
+      }
+      return resolve(stats)
+    })
+  )
 
 // TODO - Make more dynamic
 /**
@@ -117,18 +113,14 @@ const initializeDirectory = () =>
  * @returns {Promise}
  */
 const removeFile = file =>
-  new Promise((resolve, reject) => {
-    try {
-      rimraf(file, error => {
-        if (error) {
-          return reject(error)
-        }
-        resolve()
-      })
-    } catch (e) {
-      return reject(e)
-    }
-  })
+  new Promise((resolve, reject) =>
+    rimraf(file, error => {
+      if (error) {
+        return reject(error)
+      }
+      resolve()
+    })
+  )
 
 // TODO - Make this more dynamic
 /**
@@ -139,17 +131,12 @@ const removeFile = file =>
  */
 const saveFile = (res, bar) =>
   new Promise((resolve, reject) => {
-    try {
-      // fs.writeFile('env.json', JSON.stringify({ env: process.env }, null, 2), err => {})
-      const zipPath = path.join(process.env.HOME, '/CypressTool/Cypress.zip')
-      const fileStream = fs.createWriteStream(zipPath)
-      res.body.pipe(fileStream)
-      res.body.on('error', err => reject(err))
-      res.body.on('data', chunk => bar.tick(chunk.length))
-      fileStream.on('finish', () => resolve())
-    } catch (e) {
-      return reject(e)
-    }
+    const zipPath = path.join(process.env.HOME, '/CypressTool/Cypress.zip')
+    const fileStream = fs.createWriteStream(zipPath)
+    res.body.pipe(fileStream)
+    res.body.on('error', err => reject(err))
+    res.body.on('data', chunk => bar.tick(chunk.length))
+    fileStream.on('finish', () => resolve())
   })
 
 module.exports = {

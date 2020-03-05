@@ -11,26 +11,22 @@ import { saveFile } from './fileSystem'
  */
 const download = url =>
   new Promise((resolve, reject) => {
-    try {
-      fetch(url, {
-        agent: process.env.HTTP_PROXY ? new httpsProxyAgent(process.env.HTTP_PROXY) : undefined
-      })
-        .then(async response => {
-          const contentLength = await response.headers.get('content-length')
-          const bar = new ProgressBar('Downloading [:bar] :percent :etas', {
-            complete: '=',
-            incomplete: ' ',
-            width: 50,
-            total: Number(contentLength)
-          })
-
-          await saveFile(response, bar)
-          resolve()
+    fetch(url, {
+      agent: process.env.HTTP_PROXY ? new httpsProxyAgent(process.env.HTTP_PROXY) : undefined
+    })
+      .then(async response => {
+        const contentLength = await response.headers.get('content-length')
+        const bar = new ProgressBar('Downloading [:bar] :percent :etas', {
+          complete: '=',
+          incomplete: ' ',
+          width: 50,
+          total: Number(contentLength)
         })
-        .catch(e => reject(e))
-    } catch (e) {
-      return reject(e)
-    }
+
+        await saveFile(response, bar)
+        resolve()
+      })
+      .catch(e => reject(e))
   })
 
 /**
@@ -49,17 +45,13 @@ const makeRequest = (
   }
 ) =>
   new Promise((resolve, reject) => {
-    try {
-      fetch(url, {
-        headers: options.headers,
-        method: options.method,
-        agent: process.env.HTTP_PROXY ? new httpsProxyAgent(process.env.HTTP_PROXY) : undefined
-      })
-        .then(response => resolve(response.json()))
-        .catch(e => reject(e))
-    } catch (e) {
-      return reject(e)
-    }
+    fetch(url, {
+      headers: options.headers,
+      method: options.method,
+      agent: process.env.HTTP_PROXY ? new httpsProxyAgent(process.env.HTTP_PROXY) : undefined
+    })
+      .then(response => resolve(response.json()))
+      .catch(e => reject(e))
   })
 
 module.exports = { download, makeRequest }
