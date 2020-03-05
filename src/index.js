@@ -24,16 +24,16 @@ import {
 import { initializeDirectory } from './util/fileSystem'
 
 // * Prioritized TODOs
-// TODO - Option to install locally as dev dependency
+// TODO - Fully test on Windows
 // TODO - Cooler name than 'Cypress Tool'
+// TODO - Put some constants like isMac into state
+// TODO - Put CypressTool directory path into state
+// TODO - Able to exit process fully in executable
+// TODO - Option to install locally as dev dependency
+// TODO - Check if Cypress has already been downloaded and use that
 // TODO - Persist app state with configstore for a faster app
 
 // * Not Prioritized TODOs
-// TODO - Put CypressTool directory path into state
-// TODO - Put some constants like isMac into state
-// TODO - Able to exit process fully in executable
-// TODO - Fully test on Windows
-// TODO - Check if Cypress has already been downloaded and use that
 
 const main = async () => {
   try {
