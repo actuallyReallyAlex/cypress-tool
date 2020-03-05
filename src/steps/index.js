@@ -2,9 +2,9 @@ import chalk from 'chalk'
 import path from 'path'
 
 import { isMac } from '../constants'
-import { addCypress, checkIfUpToDate, getCurrentCypressVersion, getLatestCypressDetails, removeCypress } from '../util/cypress'
+import { addCypress, checkIfUpToDate, getCurrentCypressVersion, getCypressVersions, getLatestCypressDetails, removeCypress } from '../util/cypress'
 import { clearCache, getCachedVersions } from '../util/fileSystem'
-import { displayAboutMenu } from '../util/prompts'
+import { displayAboutMenu, promptCypressVersion } from '../util/prompts'
 import { download } from '../util/request'
 import {
   checkCypressInstallationSpinner,
@@ -165,12 +165,18 @@ const cleanCache = async state => {
 /**
  * Downloads and saves Cypress.zip
  * @param {Object} state Application State.
+ * @param {String} forceVersion Optional. If specified, downloads this particular version.
  * @async
  */
-const downloadCypress = async state => {
+const downloadCypress = async (state, forceVersion) => {
   try {
-    const downloadUrl = state.latestCypressDetails.packages[process.platform].url
-    const version = state.latestCypressDetails.version
+    let downloadUrl = state.latestCypressDetails.packages[process.platform].url
+    let version = state.latestCypressDetails.version
+
+    if (forceVersion) {
+      downloadUrl = `https://download.cypress.io/desktop/${forceVersion}?platform=${process.platform}`
+      version = forceVersion
+    }
 
     await download(downloadUrl).catch(e => {
       downloadSpinner.fail()
@@ -185,11 +191,17 @@ const downloadCypress = async state => {
 /**
  * Installs Cypress from the downloaded Cypress.zip. Installs latest version!
  * @param {Object} state Application State.
+ * @param {String} forceVersion Optional. If specified, downloads this particular version.
  * @async
  */
-const installCypress = async state => {
+const installCypress = async (state, forceVersion) => {
   try {
-    const version = state.latestCypressDetails.version
+    let version = state.latestCypressDetails.version
+
+    if (forceVersion) {
+      version = forceVersion
+    }
+
     const installSpinner = installCypressSpinner(version)
     installSpinner.start()
     await addCypress(version).catch(e => {
@@ -197,8 +209,8 @@ const installCypress = async state => {
       throw new Error(e)
     })
     state.installedVersion = version
-    // TODO - Probably need to make this more dynamic to handle installing out of date versions.
-    state.isUpToDate = true
+    const upToDate = await checkIfUpToDate(state.latestCypressDetails.version, version)
+    state.isUpToDate = upToDate
     state.cachedVersions.push(version)
     installSpinner.succeed(`Installed Cypress ${chalk.yellowBright('v' + version)}`)
   } catch (e) {
@@ -268,8 +280,12 @@ const interpretMenuAction = async state => {
       },
       exit: () => process.exit(0),
       install: async () => {
-        await downloadCypress(state)
-        await installCypress(state)
+        // * Get list of all available Cypress versions
+        const availableVersions = await getCypressVersions()
+        // * Prompt user to pick a Cypress version to install
+        const version = await promptCypressVersion(availableVersions)
+        await downloadCypress(state, version)
+        await installCypress(state, version)
         state.menuActionEmitter.emit('actionCompleted', state)
       },
       uninstall: async () => {

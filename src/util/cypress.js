@@ -1,7 +1,7 @@
 import path from 'path'
 import semver from 'semver'
 
-import { cypressUrl } from '../constants'
+import { cypressUrl, isMac } from '../constants'
 import { checkIfFileExists } from './fileSystem'
 import { execute, spawnProcess } from './process'
 import { makeRequest } from './request'
@@ -67,6 +67,20 @@ const getCurrentCypressVersion = () =>
   })
 
 /**
+ * Gets all available Cypress versions.
+ * @returns {Promise} Resolves to an array of all available Cypress versions.
+ */
+const getCypressVersions = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const output = await execute('npm show cypress versions -json')
+      return resolve(JSON.parse(output).reverse())
+    } catch (e) {
+      return reject(e)
+    }
+  })
+
+/**
  * Get's latest Cypress details from download url.
  * @returns {Promise} Resolves with response from Cypress.
  */
@@ -99,6 +113,7 @@ module.exports = {
   addCypress,
   checkIfUpToDate,
   getCurrentCypressVersion,
+  getCypressVersions,
   getLatestCypressDetails,
   removeCypress
 }
