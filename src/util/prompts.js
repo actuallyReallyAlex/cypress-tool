@@ -101,6 +101,28 @@ const keypress = async () => {
 }
 
 /**
+ * Prompts the user to pick a version of Cypress to install.
+ * @returns {Promise} Resolves to the String version of Cypress.
+ */
+const promptCypressVersion = availableVersions =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const { version } = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'version',
+          message: 'Choose a version of Cypress to install',
+          choices: availableVersions
+        }
+      ])
+
+      return resolve(version)
+    } catch (e) {
+      return reject(e)
+    }
+  })
+
+/**
  * Prompts user to install Cypress.
  * @param {Object} state Application State.
  * @returns {Promise} Resolves with a boolean of the user's choice.
@@ -151,4 +173,4 @@ const promptToUpdateCypress = state =>
     }
   })
 
-module.exports = { displayAboutMenu, displayMainMenu, promptToInstallCypress, promptToUpdateCypress }
+module.exports = { displayAboutMenu, displayMainMenu, promptCypressVersion, promptToInstallCypress, promptToUpdateCypress }

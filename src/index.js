@@ -24,7 +24,6 @@ import {
 import { initializeDirectory } from './util/fileSystem'
 
 // * Prioritized TODOs
-// TODO - Allow to download/install older Cypress versions as well
 // TODO - Option to install locally as dev dependency
 // TODO - Cooler name than 'Cypress Tool'
 // TODO - Persist app state with configstore for a faster app
@@ -33,6 +32,8 @@ import { initializeDirectory } from './util/fileSystem'
 // TODO - Put CypressTool directory path into state
 // TODO - Put some constants like isMac into state
 // TODO - Able to exit process fully in executable
+// TODO - Fully test on Windows
+// TODO - Check if Cypress has already been downloaded and use that
 
 const main = async () => {
   try {
