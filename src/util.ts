@@ -1,9 +1,12 @@
 import boxen, { Options as boxenOptions, BorderStyle } from "boxen";
 import chalk from "chalk";
 import clear from "clear";
+import fetch from "node-fetch";
 import figlet from "figlet";
 import fse from "fs-extra";
+import httpsProxyAgent from "https-proxy-agent";
 import path from "path";
+import ProgressBar from "progress";
 import { spawn } from "child_process";
 
 /**
@@ -166,6 +169,70 @@ export const clearCache = (): Promise<void> =>
       );
       resolve();
     } catch (error) {
+      reject(error);
+    }
+  });
+
+// * Agent used for network requests
+const agent = process.env.HTTP_PROXY
+  ? new (httpsProxyAgent as any)(process.env.HTTP_PROXY)
+  : undefined;
+
+export const getCypressInfo = async () => {
+  const response = await fetch("https://download.cypress.io/desktop.json", {
+    agent,
+    headers: { "Content-Type": "application/json" },
+    method: "GET",
+  });
+  const cypressInfo = await response.json();
+  console.log({ cypressInfo });
+  return cypressInfo;
+};
+
+export const downloadCypress = (
+  cypressUrl: string,
+  zipPath: string
+): Promise<void> =>
+  new Promise(async (resolve, reject) => {
+    const response = await fetch(cypressUrl, { agent, method: "GET" });
+    const contentLength = response.headers.get("content-length");
+    const bar = new ProgressBar("Downloading [:bar] :percent :etas", {
+      complete: "=",
+      incomplete: " ",
+      width: 50,
+      total: Number(contentLength),
+    });
+    const fileStream = fse.createWriteStream(zipPath);
+    response.body.pipe(fileStream);
+    response.body.on("error", (err) => {
+      console.log(chalk.red.inverse(err));
+      reject(err);
+    });
+    response.body.on("data", (chunk) => bar.tick(chunk.length));
+    fileStream.on("finish", async () => {
+      console.log("DONE");
+      console.log(zipPath);
+      resolve();
+    });
+  });
+
+export const installCypress = (version: string, zipPath: string) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      await executeCommand(
+        "npm",
+        ["install", "-D", `cypress@${version}`],
+        {
+          env: { ...process.env, CYPRESS_INSTALL_BINARY: zipPath },
+          path: undefined,
+          shell: process.platform === "win32",
+        },
+        true
+      );
+
+      resolve();
+    } catch (error) {
+      console.log(chalk.red.inverse(error));
       reject(error);
     }
   });

@@ -1,21 +1,18 @@
 import chalk from "chalk";
-import fetch from "node-fetch";
-import fse from "fs-extra";
-import httpsProxyAgent from "https-proxy-agent";
 import path from "path";
-import ProgressBar from "progress";
 
 import {
-  executeCommand,
-  keypress,
-  titleScreen,
-  getCacheLocation,
   clearCache,
+  getCypressInfo,
+  titleScreen,
+  downloadCypress,
+  installCypress,
+  keypress,
 } from "../util";
 
 import { AppState } from "../types";
 
-const installCypress = async (state: AppState): Promise<void> => {
+const install = async (state: AppState): Promise<void> => {
   try {
     await titleScreen("cypress-tool");
 
@@ -24,68 +21,28 @@ const installCypress = async (state: AppState): Promise<void> => {
     await clearCache();
     console.log("Cache cleared");
 
+    // * Get Cypress Information
+    const cypressInfo = await getCypressInfo();
+    const cypressUrl = cypressInfo.packages[process.platform].url;
+    const version = cypressInfo.version;
+    const zipPath = path.join(__dirname, "test.zip");
+
     // * Download Cypress.zip for platform
-    const agent = process.env.HTTP_PROXY
-      ? new (httpsProxyAgent as any)(process.env.HTTP_PROXY)
-      : undefined;
+    console.log(`Downloading Cypress v${version}`);
+    await downloadCypress(cypressUrl, zipPath);
 
-    const response = await fetch("https://download.cypress.io/desktop.json", {
-      agent,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      method: "GET",
-    });
-    const info = await response.json();
-    const cypressUrl = info.packages[process.platform].url;
-    const version = info.version;
-    console.log(`Downloading Cypress v${version} from ${cypressUrl}`);
-    fetch(cypressUrl, { agent, method: "GET" }).then(async (response) => {
-      const contentLength = response.headers.get("content-length");
-      const bar = new ProgressBar("Downloading [:bar] :percent :etas", {
-        complete: "=",
-        incomplete: " ",
-        width: 50,
-        total: Number(contentLength),
-      });
-      const zipPath = path.join(__dirname, "test.zip");
-      const fileStream = fse.createWriteStream(zipPath);
-      response.body.pipe(fileStream);
-      response.body.on("error", (err) => console.log(chalk.red.inverse(err)));
-      response.body.on("data", (chunk) => bar.tick(chunk.length));
-      fileStream.on("finish", async () => {
-        console.log("DONE");
-        console.log(zipPath);
+    // * Install Cypress from Cypress.zip
+    console.log("Installing Cypress as a devDependency in this directory");
+    await installCypress(version, zipPath);
 
-        // * Install Cypress from Cypress.zip
-        try {
-          console.log(
-            "Installing Cypress as a devDependency in this directory"
-          );
-          await executeCommand(
-            "npm",
-            ["install", "-D", `cypress@${version}`],
-            {
-              env: { ...process.env, CYPRESS_INSTALL_BINARY: zipPath },
-              path: undefined,
-              shell: process.platform === "win32",
-            },
-            true
-          );
+    console.log("Done!");
+    console.log("Press any key to continue...");
 
-          console.log("Done!");
-          console.log("Press any key to continue...");
-
-          await keypress();
-          state.menuActionEmitter.emit("actionCompleted", state);
-        } catch (error) {
-          console.log(chalk.red.inverse(error));
-        }
-      });
-    });
+    await keypress();
+    state.menuActionEmitter.emit("actionCompleted", state);
   } catch (error) {
     console.log(chalk.inverse.red(error));
   }
 };
 
-export default installCypress;
+export default install;

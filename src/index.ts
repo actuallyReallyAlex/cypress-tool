@@ -14,6 +14,9 @@ const main = async (): Promise<void> => {
   // * Needed for cert error
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
+  // * Supress warnings
+  process.env.NODE_NO_WARNINGS = "1";
+
   // * Action Emitter keeps track of user input in the menu.
   const menuActionEmitter = new EventEmitter.EventEmitter();
   menuActionEmitter.on("actionCompleted", async (state: AppState) => {
