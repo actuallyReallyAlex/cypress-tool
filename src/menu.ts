@@ -148,7 +148,7 @@ export const interpretMenuAction = async (state: AppState): Promise<void> => {
           const cypressUrl = info.packages[process.platform].url;
           const version = info.version;
           console.log(`Downloading Cypress from ${cypressUrl}`);
-          fetch(cypressUrl).then(async (response) => {
+          fetch(cypressUrl, { agent, method: "GET" }).then(async (response) => {
             const contentLength = await response.headers.get("content-length");
             const bar = new ProgressBar("Downloading [:bar] :percent :etas", {
               complete: "=",
