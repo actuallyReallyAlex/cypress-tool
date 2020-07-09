@@ -1,5 +1,5 @@
 import boxen, { Options as boxenOptions, BorderStyle } from "boxen";
-import chalk from "chalk";
+import chalk, { cyan } from "chalk";
 import clear from "clear";
 import fetch from "node-fetch";
 import figlet from "figlet";
@@ -114,6 +114,7 @@ export const executeCommand = async (
   command: string,
   args?: string[],
   options?: { cwd?: string; env?: any; path?: string; shell?: boolean },
+  dataParser?: (data: any) => void,
   debug?: boolean
 ): Promise<void | { code: number; signal: any }> =>
   new Promise((resolve, reject) => {
@@ -121,6 +122,10 @@ export const executeCommand = async (
     if (debug) {
       cp.stdout.on("data", (data) => console.log(`stdout: ${data}`));
       cp.stderr.on("data", (data) => console.log(`stderr: ${data}`));
+    }
+
+    if (dataParser) {
+      cp.stdout.on("data", dataParser);
     }
 
     cp.on("error", (err: Error) => {
@@ -219,6 +224,16 @@ export const downloadCypress = (
 export const installCypress = (version: string, zipPath: string) =>
   new Promise(async (resolve, reject) => {
     try {
+      const parseInstallData = (data: any) => {
+        console.log({ data });
+        // const bar = new ProgressBar("Installing [:bar]  :etas", {
+        //   complete: "=",
+        //   incomplete: " ",
+        //   width: 50,
+        //   total: Number(contentLength),
+        // });
+      };
+
       await executeCommand(
         "npm",
         ["install", "-D", `cypress@${version}`],
@@ -227,6 +242,7 @@ export const installCypress = (version: string, zipPath: string) =>
           path: undefined,
           shell: process.platform === "win32",
         },
+        parseInstallData,
         true
       );
 
@@ -237,9 +253,9 @@ export const installCypress = (version: string, zipPath: string) =>
     }
   });
 
-// `keyof any` is short for "string | number | symbol"
-// since an object key can be any of those types, our key can too
-// in TS 3.0+, putting just "string" raises an error
-export function hasKey<O>(obj: O, key: keyof any): key is keyof O {
+/**
+ * https://dev.to/kingdaro/indexing-objects-in-typescript-1cgi
+ */
+export const hasKey = <O>(obj: O, key: keyof any): key is keyof O => {
   return key in obj;
-}
+};
