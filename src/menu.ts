@@ -1,8 +1,8 @@
-import axios from "axios";
 import boxen from "boxen";
 import chalk from "chalk";
 import fetch from "node-fetch";
 import fse from "fs-extra";
+import httpsProxyAgent from "https-proxy-agent";
 import inquirer from "inquirer";
 import path from "path";
 import ProgressBar from "progress";
@@ -106,7 +106,7 @@ export const interpretMenuAction = async (state: AppState): Promise<void> => {
               console.log(chalk.red.inverse("No `process.env.TEMP`"));
               return;
             }
-            cacheLocation = path.join(process.env.TEMP, "..Cypress/Cache");
+            cacheLocation = path.join(process.env.TEMP, "..", "Cypress/Cache");
           }
           const cacheContents: string[] = await fse.readdir(cacheLocation);
 
@@ -126,11 +126,27 @@ export const interpretMenuAction = async (state: AppState): Promise<void> => {
 
           // * Download Cypress.zip for platform
 
-          const response = await axios.get(
-            "https://download.cypress.io/desktop.json"
+          const agent = process.env.HTTP_PROXY
+            ? new (httpsProxyAgent as any)(process.env.HTTP_PROXY)
+            : undefined;
+
+          console.log(agent);
+          const response = await fetch(
+            "https://download.cypress.io/desktop.json",
+            {
+              agent,
+              headers: {
+                "Content-Type": "application/json",
+              },
+              method: "GET",
+            }
           );
-          const cypressUrl = response.data.packages[process.platform].url;
-          const version = response.data.version;
+          const info = await response.json();
+          // const response = await axios.get(
+          //   "https://download.cypress.io/desktop.json"
+          // );
+          const cypressUrl = info.packages[process.platform].url;
+          const version = info.version;
           console.log(`Downloading Cypress from ${cypressUrl}`);
           fetch(cypressUrl).then(async (response) => {
             const contentLength = await response.headers.get("content-length");
