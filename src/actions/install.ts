@@ -8,9 +8,10 @@ import {
   downloadCypress,
   installCypress,
   keypress,
+  hasKey,
 } from "../util";
 
-import { AppState } from "../types";
+import { AppState, CypressPackage, CypressInfo } from "../types";
 
 const install = async (state: AppState): Promise<void> => {
   try {
@@ -22,24 +23,33 @@ const install = async (state: AppState): Promise<void> => {
     console.log("Cache cleared");
 
     // * Get Cypress Information
-    const cypressInfo = await getCypressInfo();
-    const cypressUrl = cypressInfo.packages[process.platform].url;
-    const version = cypressInfo.version;
-    const zipPath = path.join(__dirname, "test.zip");
+    const cypressInfo: CypressInfo = await getCypressInfo();
 
-    // * Download Cypress.zip for platform
-    console.log(`Downloading Cypress v${version}`);
-    await downloadCypress(cypressUrl, zipPath);
+    if (hasKey(cypressInfo, process.platform)) {
+      const cypressPackageInfo: CypressPackage = cypressInfo[process.platform];
+      const cypressUrl = cypressPackageInfo.url;
+      const version = cypressInfo.version;
+      const zipPath = path.join(__dirname, "test.zip");
 
-    // * Install Cypress from Cypress.zip
-    console.log("Installing Cypress as a devDependency in this directory");
-    await installCypress(version, zipPath);
+      // * Download Cypress.zip for platform
+      console.log(`Downloading Cypress v${version}`);
+      await downloadCypress(cypressUrl, zipPath);
 
-    console.log("Done!");
-    console.log("Press any key to continue...");
+      // * Install Cypress from Cypress.zip
+      console.log("Installing Cypress as a devDependency in this directory");
+      await installCypress(version, zipPath);
 
-    await keypress();
-    state.menuActionEmitter.emit("actionCompleted", state);
+      console.log("Done!");
+      console.log("Press any key to continue...");
+
+      await keypress();
+      state.menuActionEmitter.emit("actionCompleted", state);
+    } else {
+      console.error(
+        chalk.red.inverse(`No platform found. Platform = ${process.platform}`)
+      );
+      return process.exit(1);
+    }
   } catch (error) {
     console.log(chalk.inverse.red(error));
   }

@@ -8,6 +8,7 @@ import httpsProxyAgent from "https-proxy-agent";
 import path from "path";
 import ProgressBar from "progress";
 import { spawn } from "child_process";
+import { CypressInfo } from "./types";
 
 /**
  * Blank style applied to Boxen.
@@ -178,14 +179,13 @@ const agent = process.env.HTTP_PROXY
   ? new (httpsProxyAgent as any)(process.env.HTTP_PROXY)
   : undefined;
 
-export const getCypressInfo = async () => {
+export const getCypressInfo = async (): Promise<CypressInfo> => {
   const response = await fetch("https://download.cypress.io/desktop.json", {
     agent,
     headers: { "Content-Type": "application/json" },
     method: "GET",
   });
-  const cypressInfo = await response.json();
-  console.log({ cypressInfo });
+  const cypressInfo: CypressInfo = await response.json();
   return cypressInfo;
 };
 
@@ -236,3 +236,10 @@ export const installCypress = (version: string, zipPath: string) =>
       reject(error);
     }
   });
+
+// `keyof any` is short for "string | number | symbol"
+// since an object key can be any of those types, our key can too
+// in TS 3.0+, putting just "string" raises an error
+export function hasKey<O>(obj: O, key: keyof any): key is keyof O {
+  return key in obj;
+}
