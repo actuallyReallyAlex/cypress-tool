@@ -42,7 +42,6 @@
     "@types/node": "^14.0.20",
     "@types/node-fetch": "^2.5.7",
     "@types/progress": "^2.0.3",
-    "cypress": "^4.10.0",
     "rimraf": "^3.0.2",
     "typescript": "^3.9.6"
   }
