@@ -54,6 +54,30 @@ const figletPromise = (txt: string, options: any): Promise<string> =>
   );
 
 /**
+ * Pauses the process execution and waits for the user to hit a key.
+ * @returns {Promise} Resolves when user has entered a keystroke.
+ * @async
+ */
+export const keypress = async (): Promise<void> => {
+  try {
+    process.stdin.setRawMode(true);
+    return new Promise((resolve, reject) => {
+      try {
+        process.stdin.resume();
+        process.stdin.once("data", () => {
+          process.stdin.setRawMode(false);
+          resolve();
+        });
+      } catch (e) {
+        return reject(e);
+      }
+    });
+  } catch (e) {
+    throw new Error(e);
+  }
+};
+
+/**
  * Displays a title in the center of the terminal.
  * @param {String} title Title to be disaplayed.
  * @returns {Promise} Resolves after logging to the console.
@@ -110,4 +134,38 @@ export const executeCommand = async (
       resolve();
     });
     cp.on("message", (message) => console.log({ message }));
+  });
+
+export const getCacheLocation = (): string => {
+  let cacheLocation: string = "";
+  if (process.platform === "darwin") {
+    if (!process.env.HOME) {
+      console.log(chalk.red.inverse("No `process.env.HOME`"));
+      return process.exit(1);
+    }
+    cacheLocation = path.join(process.env.HOME, "/Library/Caches/Cypress");
+  } else {
+    if (!process.env.TEMP) {
+      console.log(chalk.red.inverse("No `process.env.TEMP`"));
+      return process.exit(1);
+    }
+    cacheLocation = path.join(process.env.TEMP, "..", "Cypress/Cache");
+  }
+  return cacheLocation;
+};
+
+export const clearCache = (): Promise<void> =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const cacheLocation = getCacheLocation();
+      const cacheContents: string[] = await fse.readdir(cacheLocation);
+      await Promise.all(
+        cacheContents.map(async (cacheDirName: string) => {
+          await fse.remove(path.join(cacheLocation, cacheDirName));
+        })
+      );
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
   });

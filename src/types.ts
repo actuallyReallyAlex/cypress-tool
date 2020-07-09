@@ -10,4 +10,4 @@ export interface AppState {
   menuActionEmitter: EventEmitter.EventEmitter;
 }
 
-export type MenuAction = "about" | "installCypress" | "exit" | null;
+export type MenuAction = "about" | "install" | "exit" | null;
