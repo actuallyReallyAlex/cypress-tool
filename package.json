@@ -7,7 +7,7 @@
     "cypress-tool": "./index.js"
   },
   "scripts": {
-    "build": "npm run format && rimraf build && tsc",
+    "build": "npm run format && npm run lint && rimraf build && tsc",
     "format": "prettier --write src",
     "lint": "eslint src",
     "start": "node build/index.js -- start"
