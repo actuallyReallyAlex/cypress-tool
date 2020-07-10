@@ -5,6 +5,7 @@ import fetch from "node-fetch";
 import figlet from "figlet";
 import fse from "fs-extra";
 import httpsProxyAgent from "https-proxy-agent";
+import inquirer from "inquirer";
 import path from "path";
 import ProgressBar from "progress";
 import { spawn } from "child_process";
@@ -277,4 +278,32 @@ export const installCypress = (version: string, zipPath: string) =>
  */
 export const hasKey = <O>(obj: O, key: keyof any): key is keyof O => {
   return key in obj;
+};
+
+export const getAvailableVersions = async (): Promise<string[]> => {
+  let availableVersions: string[] = [];
+  await executeCommand(
+    "npm",
+    ["show", "cypress", "versions", "-json"],
+    { env: { ...process.env } },
+    (data: Buffer) => {
+      availableVersions = JSON.parse(data.toString());
+      availableVersions.reverse();
+    }
+  );
+  return availableVersions;
+};
+
+export const promptVersion = async (
+  availableVersions: string[]
+): Promise<string> => {
+  const { version } = await inquirer.prompt([
+    {
+      type: "list",
+      name: "version",
+      message: "Choose a version of Cypress to install",
+      choices: availableVersions,
+    },
+  ]);
+  return version;
 };
