@@ -10,25 +10,7 @@ export interface AppState {
   menuActionEmitter: EventEmitter.EventEmitter;
 }
 
-export interface CypressInfo {
-  name: string;
-  version: string;
-  packages: {
-    mac: CypressPackage;
-    win: CypressPackage;
-    linux64: CypressPackage;
-    darwin: CypressPackage;
-    win32: CypressPackage;
-    linux: CypressPackage;
-    "darkwin-x64": CypressPackage;
-    "linux-x64": CypressPackage;
-    "win32-ia32": CypressPackage;
-    "win32-x64": CypressPackage;
-  };
-}
-
-export interface CypressPackage {
-  url: string;
-}
-
+/**
+ * Menu Action (option)
+ */
 export type MenuAction = "about" | "install" | "exit" | null;

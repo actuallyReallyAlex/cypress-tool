@@ -1,14 +1,14 @@
 import boxen, { Options as boxenOptions, BorderStyle } from "boxen";
-import chalk, { cyan } from "chalk";
+import chalk from "chalk";
 import clear from "clear";
 import fetch from "node-fetch";
 import figlet from "figlet";
 import fse from "fs-extra";
 import httpsProxyAgent from "https-proxy-agent";
+import inquirer from "inquirer";
 import path from "path";
 import ProgressBar from "progress";
 import { spawn } from "child_process";
-import { CypressInfo } from "./types";
 
 /**
  * Blank style applied to Boxen.
@@ -42,6 +42,7 @@ export const defaultBoxenStyle: boxenOptions = {
  * @param {Object} options Options object.
  * @returns {Promise} Resolves with text.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const figletPromise = (txt: string, options: any): Promise<string> =>
   new Promise((resolve, reject) =>
     figlet.text(
@@ -113,9 +114,11 @@ export default titleScreen;
 export const executeCommand = async (
   command: string,
   args?: string[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   options?: { cwd?: string; env?: any; path?: string; shell?: boolean },
-  dataParser?: (data: any) => void,
+  dataParser?: (data: Buffer) => void,
   debug?: boolean
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<void | { code: number; signal: any }> =>
   new Promise((resolve, reject) => {
     const cp = spawn(command, args, options);
@@ -145,8 +148,11 @@ export const executeCommand = async (
     cp.on("message", (message) => console.log({ message }));
   });
 
+/**
+ * Gets the location of the Cypress cache.
+ */
 export const getCacheLocation = (): string => {
-  let cacheLocation: string = "";
+  let cacheLocation = "";
   if (process.platform === "darwin") {
     if (!process.env.HOME) {
       console.log(chalk.red.inverse("No `process.env.HOME`"));
@@ -163,6 +169,9 @@ export const getCacheLocation = (): string => {
   return cacheLocation;
 };
 
+/**
+ * Removes every version in the Cypress cache.
+ */
 export const clearCache = (): Promise<void> =>
   new Promise(async (resolve, reject) => {
     try {
@@ -181,19 +190,15 @@ export const clearCache = (): Promise<void> =>
 
 // * Agent used for network requests
 const agent = process.env.HTTP_PROXY
-  ? new (httpsProxyAgent as any)(process.env.HTTP_PROXY)
+  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    new (httpsProxyAgent as any)(process.env.HTTP_PROXY)
   : undefined;
 
-export const getCypressInfo = async (): Promise<CypressInfo> => {
-  const response = await fetch("https://download.cypress.io/desktop.json", {
-    agent,
-    headers: { "Content-Type": "application/json" },
-    method: "GET",
-  });
-  const cypressInfo: CypressInfo = await response.json();
-  return cypressInfo;
-};
-
+/**
+ * Downloads and saves a .zip file of Cypress.
+ * @param cypressUrl URL to download Cypress from.
+ * @param zipPath Path to save .zip file to.
+ */
 export const downloadCypress = (
   cypressUrl: string,
   zipPath: string
@@ -214,7 +219,15 @@ export const downloadCypress = (
     fileStream.on("finish", async () => resolve());
   });
 
-export const installCypress = (version: string, zipPath: string) =>
+/**
+ * Installs Cypress from previously downloaded .zip file.
+ * @param version Cypress version.
+ * @param zipPath Path to .zip file of Cypress.
+ */
+export const installCypress = (
+  version: string,
+  zipPath: string
+): Promise<void> =>
   new Promise(async (resolve, reject) => {
     try {
       const installBar = new ProgressBar("Installing [:bar] :percent :etas", {
@@ -275,6 +288,42 @@ export const installCypress = (version: string, zipPath: string) =>
 /**
  * https://dev.to/kingdaro/indexing-objects-in-typescript-1cgi
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const hasKey = <O>(obj: O, key: keyof any): key is keyof O => {
   return key in obj;
+};
+
+/**
+ * Gets a list of available Cypress versions.
+ */
+export const getAvailableVersions = async (): Promise<string[]> => {
+  let availableVersions: string[] = [];
+  await executeCommand(
+    "npm",
+    ["show", "cypress", "versions", "-json"],
+    { env: { ...process.env } },
+    (data: Buffer) => {
+      availableVersions = JSON.parse(data.toString());
+      availableVersions.reverse();
+    }
+  );
+  return availableVersions;
+};
+
+/**
+ * Prompts user to select a specific Cypress version from a list of available versions.
+ * @param availableVersions List of available Cypress versions.
+ */
+export const promptVersion = async (
+  availableVersions: string[]
+): Promise<string> => {
+  const { version } = await inquirer.prompt([
+    {
+      type: "list",
+      name: "version",
+      message: "Choose a version of Cypress to install",
+      choices: availableVersions,
+    },
+  ]);
+  return version;
 };
