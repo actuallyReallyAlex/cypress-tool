@@ -3,7 +3,7 @@ import { Options as boxenOptions } from "boxen";
 /**
  * Application Version
  */
-export const version = "1.1.0";
+export const version = "1.1.1";
 
 /**
  * Blank style applied to Boxen.
