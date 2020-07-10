@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `spawn npm ENOENT` on Windows - [#33](https://github.com/alexlee-dev/cypress-tool/issues/33)
+
 ## [1.1.0] - 2020-07-10
 
 ### 📝 Version Selection

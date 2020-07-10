@@ -301,7 +301,11 @@ export const getAvailableVersions = async (): Promise<string[]> => {
   await executeCommand(
     "npm",
     ["show", "cypress", "versions", "-json"],
-    { env: { ...process.env } },
+    {
+      env: { ...process.env },
+      path: undefined,
+      shell: process.platform === "win32",
+    },
     (data: Buffer) => {
       availableVersions = JSON.parse(data.toString());
       availableVersions.reverse();
