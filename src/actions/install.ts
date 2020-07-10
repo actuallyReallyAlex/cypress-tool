@@ -25,8 +25,9 @@ const install = async (state: AppState): Promise<void> => {
     // * Get Cypress Information
     const cypressInfo: CypressInfo = await getCypressInfo();
 
-    if (hasKey(cypressInfo, process.platform)) {
-      const cypressPackageInfo: CypressPackage = cypressInfo[process.platform];
+    if (hasKey(cypressInfo.packages, process.platform)) {
+      const cypressPackageInfo: CypressPackage =
+        cypressInfo.packages[process.platform];
       const cypressUrl = cypressPackageInfo.url;
       const version = cypressInfo.version;
       const zipPath = path.join(__dirname, "test.zip");
@@ -47,6 +48,11 @@ const install = async (state: AppState): Promise<void> => {
     } else {
       console.error(
         chalk.red.inverse(`No platform found. Platform = ${process.platform}`)
+      );
+      console.error(
+        `Could not find key (${
+          process.platform
+        }) within object (${JSON.stringify(cypressInfo.packages, null, 2)})`
       );
       return process.exit(1);
     }

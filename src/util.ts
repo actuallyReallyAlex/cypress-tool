@@ -224,14 +224,42 @@ export const downloadCypress = (
 export const installCypress = (version: string, zipPath: string) =>
   new Promise(async (resolve, reject) => {
     try {
-      const parseInstallData = (data: any) => {
-        console.log({ data });
-        // const bar = new ProgressBar("Installing [:bar]  :etas", {
-        //   complete: "=",
-        //   incomplete: " ",
-        //   width: 50,
-        //   total: Number(contentLength),
-        // });
+      const installBar = new ProgressBar("Installing [:bar] :percent :etas", {
+        complete: "=",
+        incomplete: " ",
+        width: 50,
+        total: 100,
+      });
+
+      let installationCompleted = false;
+
+      const parseInstallData = (data: Buffer) => {
+        const stringData = data.toString();
+
+        const percentCompleteDigit1 = stringData.match(/\d%/gm);
+        const percentCompleteDigit2 = stringData.match(/\d\d%/gm);
+        const percentCompleteDigit3 = stringData.match(/\d\d\d%/gm);
+
+        const percentComplete = percentCompleteDigit3
+          ? percentCompleteDigit3
+          : percentCompleteDigit2
+          ? percentCompleteDigit2
+          : percentCompleteDigit1;
+
+        const number =
+          Number(percentComplete?.toString().replace(/%/gm, "")) || 1;
+
+        if (number === 100) {
+          installationCompleted = true;
+        }
+
+        if (installationCompleted) {
+          if (!installBar.complete) {
+            installBar.update(1);
+          }
+        } else {
+          installBar.update(number / 100);
+        }
       };
 
       await executeCommand(
@@ -242,8 +270,7 @@ export const installCypress = (version: string, zipPath: string) =>
           path: undefined,
           shell: process.platform === "win32",
         },
-        parseInstallData,
-        true
+        parseInstallData
       );
 
       resolve();
