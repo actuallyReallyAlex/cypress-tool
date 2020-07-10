@@ -17,6 +17,9 @@
     "installer",
     "updater"
   ],
+  "files": [
+    "build"
+  ],
   "author": "Alex Lee (www.alexlee.dev)",
   "license": "MIT",
   "dependencies": {
