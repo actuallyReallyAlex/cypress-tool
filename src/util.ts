@@ -148,6 +148,9 @@ export const executeCommand = async (
     cp.on("message", (message) => console.log({ message }));
   });
 
+/**
+ * Gets the location of the Cypress cache.
+ */
 export const getCacheLocation = (): string => {
   let cacheLocation = "";
   if (process.platform === "darwin") {
@@ -166,6 +169,9 @@ export const getCacheLocation = (): string => {
   return cacheLocation;
 };
 
+/**
+ * Removes every version in the Cypress cache.
+ */
 export const clearCache = (): Promise<void> =>
   new Promise(async (resolve, reject) => {
     try {
@@ -188,6 +194,11 @@ const agent = process.env.HTTP_PROXY
     new (httpsProxyAgent as any)(process.env.HTTP_PROXY)
   : undefined;
 
+/**
+ * Downloads and saves a .zip file of Cypress.
+ * @param cypressUrl URL to download Cypress from.
+ * @param zipPath Path to save .zip file to.
+ */
 export const downloadCypress = (
   cypressUrl: string,
   zipPath: string
@@ -208,6 +219,11 @@ export const downloadCypress = (
     fileStream.on("finish", async () => resolve());
   });
 
+/**
+ * Installs Cypress from previously downloaded .zip file.
+ * @param version Cypress version.
+ * @param zipPath Path to .zip file of Cypress.
+ */
 export const installCypress = (
   version: string,
   zipPath: string
@@ -277,6 +293,9 @@ export const hasKey = <O>(obj: O, key: keyof any): key is keyof O => {
   return key in obj;
 };
 
+/**
+ * Gets a list of available Cypress versions.
+ */
 export const getAvailableVersions = async (): Promise<string[]> => {
   let availableVersions: string[] = [];
   await executeCommand(
@@ -291,6 +310,10 @@ export const getAvailableVersions = async (): Promise<string[]> => {
   return availableVersions;
 };
 
+/**
+ * Prompts user to select a specific Cypress version from a list of available versions.
+ * @param availableVersions List of available Cypress versions.
+ */
 export const promptVersion = async (
   availableVersions: string[]
 ): Promise<string> => {

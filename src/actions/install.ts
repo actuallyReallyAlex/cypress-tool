@@ -14,6 +14,10 @@ import {
 
 import { AppState } from "../types";
 
+/**
+ * Walks user through installing Cypress.
+ * @param state Application State.
+ */
 const install = async (state: AppState): Promise<void> => {
   let currentSpinner = ora();
   try {

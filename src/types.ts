@@ -10,4 +10,7 @@ export interface AppState {
   menuActionEmitter: EventEmitter.EventEmitter;
 }
 
+/**
+ * Menu Action (option)
+ */
 export type MenuAction = "about" | "install" | "exit" | null;

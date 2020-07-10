@@ -6,6 +6,10 @@ import { keypress, titleScreen } from "../util";
 
 import { AppState } from "../types";
 
+/**
+ * Displays the About Screen.
+ * @param state State of Application.
+ */
 const about = async (state: AppState): Promise<void> => {
   await titleScreen("cypress-tool");
   console.log(
