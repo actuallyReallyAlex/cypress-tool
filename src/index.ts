@@ -1,9 +1,7 @@
-import clear from "clear";
 import Configstore from "configstore";
 import EventEmitter from "events";
 
 import { displayMainMenu, interpretMenuAction } from "./menu";
-import setup from "./setup";
 import { titleScreen } from "./util";
 import { AppState } from "./types";
 
@@ -39,15 +37,6 @@ const main = async (): Promise<void> => {
   };
 
   try {
-    const isSetUp: boolean = config.get("isSetUp");
-
-    if (!isSetUp) {
-      // * The user has not gone through a setup process
-      // * Set up the user
-      await setup(state);
-      clear();
-    }
-
     await titleScreen("cypress-tool");
     await displayMainMenu(state);
     await interpretMenuAction(state);
