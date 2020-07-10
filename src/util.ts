@@ -209,16 +209,9 @@ export const downloadCypress = (
     });
     const fileStream = fse.createWriteStream(zipPath);
     response.body.pipe(fileStream);
-    response.body.on("error", (err) => {
-      console.log(chalk.red.inverse(err));
-      reject(err);
-    });
+    response.body.on("error", (err) => reject(err));
     response.body.on("data", (chunk) => bar.tick(chunk.length));
-    fileStream.on("finish", async () => {
-      console.log("DONE");
-      console.log(zipPath);
-      resolve();
-    });
+    fileStream.on("finish", async () => resolve());
   });
 
 export const installCypress = (version: string, zipPath: string) =>
@@ -275,7 +268,6 @@ export const installCypress = (version: string, zipPath: string) =>
 
       resolve();
     } catch (error) {
-      console.log(chalk.red.inverse(error));
       reject(error);
     }
   });
