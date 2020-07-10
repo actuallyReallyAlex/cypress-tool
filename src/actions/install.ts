@@ -26,7 +26,7 @@ const install = async (state: AppState): Promise<void> => {
 
     // * Get List of Available Versions
     currentSpinner = ora("Getting list of available versions").start();
-    let availableVersions: string[] = await getAvailableVersions();
+    const availableVersions: string[] = await getAvailableVersions();
     currentSpinner.succeed("Received list of available versions");
 
     // * Prompt Cypress version

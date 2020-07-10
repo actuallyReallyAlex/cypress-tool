@@ -58,7 +58,7 @@ export const interpretMenuAction = async (state: AppState): Promise<void> => {
         state.menuActionEmitter.emit("actionCompleted", state);
       },
       install,
-      exit: (state: AppState): void => process.exit(),
+      exit: (): void => process.exit(),
     };
 
     await actions[state.menuAction](state);
