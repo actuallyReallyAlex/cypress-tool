@@ -25,6 +25,7 @@
   "author": "Alex Lee (www.alexlee.dev)",
   "license": "MIT",
   "dependencies": {
+    "@sentry/node": "^5.19.1",
     "boxen": "^4.2.0",
     "chalk": "^4.1.0",
     "clear": "^0.1.0",

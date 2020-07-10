@@ -1,3 +1,10 @@
+import * as Sentry from "@sentry/node";
+Sentry.init({
+  dsn:
+    "https://166cfccac6334fa29750ddf656c53445@o202486.ingest.sentry.io/3668079",
+  release: "1.1.0",
+});
+
 import Configstore from "configstore";
 import EventEmitter from "events";
 
