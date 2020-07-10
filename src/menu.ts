@@ -1,10 +1,7 @@
-import boxen from "boxen";
-import chalk from "chalk";
 import inquirer from "inquirer";
 
+import about from "./actions/about";
 import install from "./actions/install";
-import { blankBoxenStyle } from "./constants";
-import { keypress, titleScreen } from "./util";
 
 import { AppState, MenuAction } from "./types";
 
@@ -47,16 +44,7 @@ export const interpretMenuAction = async (state: AppState): Promise<void> => {
       throw new Error("menuAction can not be `null`");
     }
     const actions = {
-      about: async (state: AppState): Promise<void> => {
-        await titleScreen("cypress-tool");
-        console.log(
-          boxen(chalk.blueBright(`Author: `) + "Alex Lee", blankBoxenStyle)
-        );
-
-        console.log("Press any key to return to Main Menu ...");
-        await keypress();
-        state.menuActionEmitter.emit("actionCompleted", state);
-      },
+      about,
       install,
       exit: (): void => process.exit(),
     };
