@@ -1,47 +1,54 @@
 {
   "name": "cypress-tool",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Tool to help update/fix Cypress installs.",
-  "main": "lib/index.js",
-  "bin": "bin.js",
+  "main": "index.js",
+  "bin": {
+    "cypress-tool": "./index.js"
+  },
   "scripts": {
-    "build": "babel src -d lib",
-    "start": "node bin.js",
-    "clean": "rimraf lib",
-    "format": "prettier --write \"**/*.{js,json}\"",
-    "compile": "pkg . --targets node10-macos-x64,node10-win-x64"
+    "build": "rimraf build && tsc",
+    "start": "node build/index.js -- start"
   },
-  "keywords": [],
-  "author": "Alex Lee <www.alexlee.dev>",
-  "pkg": {
-    "scripts": [
-      "lib/**/*.js"
-    ],
-    "assets": [
-      "node_modules/figlet/fonts/slant.flf"
-    ]
-  },
+  "keywords": [
+    "cypress",
+    "tool",
+    "cypress-tool",
+    "installer",
+    "updater"
+  ],
+  "author": "Alex Lee (www.alexlee.dev)",
+  "license": "MIT",
   "dependencies": {
-    "@sentry/node": "^5.13.0",
     "boxen": "^4.2.0",
-    "chalk": "^3.0.0",
+    "chalk": "^4.1.0",
     "clear": "^0.1.0",
-    "core-js": "^3.6.4",
-    "figlet": "^1.3.0",
+    "configstore": "^5.0.1",
+    "figlet": "^1.4.0",
+    "fs-extra": "^9.0.1",
     "https-proxy-agent": "^5.0.0",
-    "inquirer": "^7.0.5",
+    "inquirer": "^7.3.0",
     "node-fetch": "^2.6.0",
-    "ora": "^4.0.3",
-    "progress": "^2.0.3",
-    "regenerator-runtime": "^0.13.3",
-    "rimraf": "^3.0.2",
-    "semver": "^7.1.3"
+    "ora": "^4.0.4",
+    "progress": "^2.0.3"
   },
   "devDependencies": {
-    "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.8.6",
-    "@babel/preset-env": "^7.8.6",
-    "pkg": "^4.4.4",
-    "prettier": "^1.19.1"
+    "@babel/cli": "^7.10.4",
+    "@babel/core": "^7.10.4",
+    "@babel/plugin-transform-runtime": "^7.10.4",
+    "@babel/preset-env": "^7.10.4",
+    "@babel/runtime": "^7.10.4",
+    "@types/boxen": "^3.0.1",
+    "@types/chalk": "^2.2.0",
+    "@types/clear": "^0.1.0",
+    "@types/configstore": "^4.0.0",
+    "@types/figlet": "^1.2.0",
+    "@types/fs-extra": "^9.0.1",
+    "@types/inquirer": "^6.5.0",
+    "@types/node": "^14.0.20",
+    "@types/node-fetch": "^2.5.7",
+    "@types/progress": "^2.0.3",
+    "rimraf": "^3.0.2",
+    "typescript": "^3.9.6"
   }
 }
