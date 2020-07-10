@@ -1,5 +1,5 @@
 import boxen, { Options as boxenOptions, BorderStyle } from "boxen";
-import chalk, { cyan } from "chalk";
+import chalk from "chalk";
 import clear from "clear";
 import fetch from "node-fetch";
 import figlet from "figlet";
@@ -43,6 +43,7 @@ export const defaultBoxenStyle: boxenOptions = {
  * @param {Object} options Options object.
  * @returns {Promise} Resolves with text.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const figletPromise = (txt: string, options: any): Promise<string> =>
   new Promise((resolve, reject) =>
     figlet.text(
@@ -114,9 +115,11 @@ export default titleScreen;
 export const executeCommand = async (
   command: string,
   args?: string[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   options?: { cwd?: string; env?: any; path?: string; shell?: boolean },
-  dataParser?: (data: any) => void,
+  dataParser?: (data: Buffer) => void,
   debug?: boolean
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<void | { code: number; signal: any }> =>
   new Promise((resolve, reject) => {
     const cp = spawn(command, args, options);
@@ -147,7 +150,7 @@ export const executeCommand = async (
   });
 
 export const getCacheLocation = (): string => {
-  let cacheLocation: string = "";
+  let cacheLocation = "";
   if (process.platform === "darwin") {
     if (!process.env.HOME) {
       console.log(chalk.red.inverse("No `process.env.HOME`"));
@@ -182,7 +185,8 @@ export const clearCache = (): Promise<void> =>
 
 // * Agent used for network requests
 const agent = process.env.HTTP_PROXY
-  ? new (httpsProxyAgent as any)(process.env.HTTP_PROXY)
+  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    new (httpsProxyAgent as any)(process.env.HTTP_PROXY)
   : undefined;
 
 export const getCypressInfo = async (): Promise<CypressInfo> => {
@@ -215,7 +219,10 @@ export const downloadCypress = (
     fileStream.on("finish", async () => resolve());
   });
 
-export const installCypress = (version: string, zipPath: string) =>
+export const installCypress = (
+  version: string,
+  zipPath: string
+): Promise<void> =>
   new Promise(async (resolve, reject) => {
     try {
       const installBar = new ProgressBar("Installing [:bar] :percent :etas", {
