@@ -13,7 +13,7 @@ const setup = async (state: AppState): Promise<void> => {
 
     console.log(
       `Welcome to ${chalk.blueBright(
-        "new"
+        "cypress-tool"
       )}! Let's walk you through the initial set up.\n`
     );
 

@@ -8,12 +8,17 @@
   },
   "scripts": {
     "build": "rimraf build && tsc",
-    "start": "node build/index.js -- start",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node build/index.js -- start"
   },
-  "keywords": [],
-  "author": "Alex Lee",
-  "license": "",
+  "keywords": [
+    "cypress",
+    "tool",
+    "cypress-tool",
+    "installer",
+    "updater"
+  ],
+  "author": "Alex Lee (www.alexlee.dev)",
+  "license": "MIT",
   "dependencies": {
     "boxen": "^4.2.0",
     "chalk": "^4.1.0",

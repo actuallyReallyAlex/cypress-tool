@@ -4,15 +4,15 @@ import ora from "ora";
 
 import {
   clearCache,
-  getCypressInfo,
-  titleScreen,
   downloadCypress,
+  getCypressInfo,
+  hasKey,
   installCypress,
   keypress,
-  hasKey,
+  titleScreen,
 } from "../util";
 
-import { AppState, CypressPackage, CypressInfo } from "../types";
+import { AppState, CypressInfo, CypressPackage } from "../types";
 
 const install = async (state: AppState): Promise<void> => {
   let currentSpinner = ora();
