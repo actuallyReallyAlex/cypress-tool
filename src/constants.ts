@@ -1,6 +1,6 @@
 import { Options as boxenOptions } from "boxen";
 
-export const version = "1.0.0";
+export const version = "1.1.0";
 
 /**
  * Blank style applied to Boxen.
